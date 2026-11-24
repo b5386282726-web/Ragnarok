@@ -1,0 +1,2081 @@
+<!doctype html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fff8fb">
+  <meta name="description" content="RAGNAROKRITH — каталог Minecraft. Русский интерфейс.">
+  <title>RAGNAROKRITH — каталог Minecraft</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #10151d;
+      --surface: #171f2a;
+      --surface-raised: #1d2734;
+      --surface-soft: #131b25;
+      --text: #edf2f7;
+      --muted: #9ba9b8;
+      --line: #2b3948;
+      --accent: #69d2c4;
+      --accent-strong: #8be1d5;
+      --accent-ink: #09201d;
+      --pink: #e6a1c2;
+      --danger: #f18b93;
+      --success: #8ed1a7;
+      --radius: 16px;
+      --radius-small: 11px;
+      --content: 1160px;
+    }
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #f3f6f8;
+      --surface: #ffffff;
+      --surface-raised: #f8fafb;
+      --surface-soft: #edf2f4;
+      --text: #192631;
+      --muted: #647583;
+      --line: #dce4e8;
+      --accent: #147f73;
+      --accent-strong: #0d6e63;
+      --accent-ink: #ffffff;
+      --pink: #a94d78;
+      --danger: #b83f51;
+      --success: #287b4b;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font: 14px/1.55 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: .55; }
+    a { color: inherit; }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+    .skip-link {
+      position: fixed; top: 10px; left: 10px; z-index: 100;
+      transform: translateY(-160%); padding: 10px 14px;
+      color: var(--accent-ink); background: var(--accent); border-radius: 8px;
+    }
+    .skip-link:focus { transform: translateY(0); }
+    .wrap { width: min(var(--content), calc(100% - 40px)); margin-inline: auto; }
+    .topbar {
+      position: sticky; top: 0; z-index: 20;
+      background: var(--bg); border-bottom: 1px solid var(--line);
+    }
+    .topinner { min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; text-decoration: none; flex: 0 0 auto; }
+    .brandmark {
+      width: 40px; height: 40px; display: grid; place-items: center;
+      border-radius: 11px; background: var(--accent); color: var(--accent-ink);
+      font: 800 19px/1 ui-sans-serif, system-ui, sans-serif;
+    }
+    .brandname { font-weight: 850; letter-spacing: .16em; font-size: 16px; line-height: 1.15; }
+    .brandname small { display: block; margin-top: 4px; color: var(--muted); font-size: 9px; font-weight: 750; letter-spacing: .2em; }
+    .nav { display: flex; align-items: center; gap: 4px; }
+    .nav button, .iconbtn, .btn, .chip, .reaction, .readmore, .adminnav button {
+      border: 1px solid transparent; border-radius: var(--radius-small);
+      transition: background-color .16s ease, border-color .16s ease, color .16s ease;
+    }
+    .nav button, .adminnav button {
+      padding: 10px 12px; color: var(--muted); background: transparent;
+    }
+    .nav button:hover, .nav button.active, .adminnav button:hover, .adminnav button.active {
+      background: var(--surface-raised); color: var(--text); border-color: var(--line);
+    }
+    .actions { display: flex; align-items: center; gap: 8px; }
+    .iconbtn {
+      min-height: 40px; min-width: 40px; padding: 8px 11px;
+      background: var(--surface); color: var(--text); border-color: var(--line);
+    }
+    .iconbtn:hover, .btn.secondary:hover, .reaction:hover { background: var(--surface-raised); border-color: var(--accent); }
+    .btn {
+      min-height: 42px; padding: 10px 15px;
+      background: var(--accent); color: var(--accent-ink);
+      border-color: var(--accent); font-weight: 800;
+    }
+    .btn:hover { background: var(--accent-strong); border-color: var(--accent-strong); }
+    .btn.secondary { background: var(--surface); color: var(--text); border-color: var(--line); }
+    .btn.danger { background: var(--danger); color: #260d12; border-color: var(--danger); }
+    [data-theme="light"] .btn.danger { color: #fff; }
+    .btn.small { min-height: 34px; padding: 6px 10px; font-size: 12px; }
+    .mobilemenu { display: none; }
+    .page { display: none; min-height: 65vh; padding: 34px 0 68px; }
+    .page.active { display: block; }
+    .hero {
+      min-height: 430px; padding: 58px 0 40px;
+      display: grid; grid-template-columns: 1.08fr .92fr; align-items: center; gap: 42px;
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 9px;
+      padding: 7px 11px; border: 1px solid var(--line); border-radius: 999px;
+      background: var(--surface); color: var(--accent); font-size: 10px;
+      font-weight: 850; letter-spacing: .1em; text-transform: uppercase;
+    }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--success); }
+    h1, h2, h3, p { margin-top: 0; }
+    .hero h1 {
+      max-width: 700px; margin: 22px 0 17px;
+      font-size: clamp(42px, 6.1vw, 72px); line-height: .99;
+      letter-spacing: -.065em; font-weight: 850;
+    }
+    .accent-text { color: var(--accent); }
+    .hero-copy { max-width: 600px; color: var(--muted); font-size: 15px; line-height: 1.85; }
+    .hero-cta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 25px; }
+    .hero-art {
+      position: relative; min-height: 320px; display: grid; place-items: center;
+      border: 1px solid var(--line); border-radius: 24px;
+      background: var(--surface); overflow: hidden;
+    }
+    .art-grid {
+      position: absolute; inset: 0; opacity: .45;
+      background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size: 34px 34px;
+    }
+    .art-orbit { position: absolute; width: 250px; height: 110px; border: 1px solid var(--accent); border-radius: 50%; transform: rotate(-28deg); }
+    .art-orbit.second { width: 290px; height: 140px; border-color: var(--pink); transform: rotate(48deg); }
+    .art-orbit.third { width: 220px; height: 220px; border-color: var(--line); transform: rotate(12deg); }
+    .art-core {
+      position: relative; z-index: 1; width: 126px; height: 126px;
+      display: grid; place-items: center; transform: rotate(45deg);
+      border: 2px solid var(--accent); border-radius: 28px;
+      background: var(--surface-raised); color: var(--accent);
+      font-size: 48px; font-weight: 900;
+    }
+    .art-core span { transform: rotate(-45deg); }
+    .art-label {
+      position: absolute; z-index: 2; padding: 8px 11px;
+      border: 1px solid var(--line); border-radius: 9px;
+      background: var(--surface-raised); color: var(--text);
+      font-size: 10px; font-weight: 850; letter-spacing: .04em;
+    }
+    .art-label.one { top: 26px; left: 20px; }
+    .art-label.two { top: 86px; right: 15px; }
+    .art-label.three { bottom: 25px; left: 25px; }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 3px 0 48px; }
+    .stat, .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+    .stat { padding: 17px 18px; }
+    .stat b { display: block; margin-bottom: 3px; font-size: 25px; line-height: 1.2; font-weight: 850; letter-spacing: -.04em; }
+    .stat span { color: var(--muted); font-size: 11px; }
+    .sectionhead { display: flex; justify-content: space-between; align-items: end; gap: 18px; margin: 28px 0 17px; }
+    .sectionhead h2 { margin: 0; font-size: 26px; line-height: 1.2; letter-spacing: -.04em; }
+    .sectionhead p { margin: 6px 0 0; color: var(--muted); }
+    .feedtools { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+    .field {
+      width: 100%; min-height: 42px; padding: 10px 12px;
+      color: var(--text); background: var(--surface-soft);
+      border: 1px solid var(--line); border-radius: var(--radius-small); outline: none;
+    }
+    .field:focus { border-color: var(--accent); }
+    .field::placeholder { color: var(--muted); opacity: .8; }
+    textarea.field { resize: vertical; min-height: 88px; }
+    .search { flex: 1 1 230px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+    .chip { padding: 8px 11px; background: var(--surface); color: var(--muted); border-color: var(--line); font-size: 11px; font-weight: 800; }
+    .chip:hover, .chip.active { background: var(--surface-raised); color: var(--accent); border-color: var(--accent); }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .post { min-height: 248px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+    .post:hover { border-color: var(--accent); }
+    .posttop { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .tag { display: inline-flex; align-items: center; max-width: 100%; padding: 5px 8px; border: 1px solid var(--line); border-radius: 999px; color: var(--accent); background: var(--surface-soft); font-size: 10px; font-weight: 800; }
+    .post h3 { margin: 0; font-size: 17px; line-height: 1.4; letter-spacing: -.02em; }
+    .post p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.75; }
+    .postmeta { display: flex; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 10px; margin-top: auto; }
+    .postfoot { display: flex; align-items: center; justify-content: space-between; gap: 8px; border-top: 1px solid var(--line); padding-top: 11px; }
+    .reactions { display: flex; gap: 6px; }
+    .reaction { padding: 7px 9px; background: var(--surface-soft); color: var(--muted); border-color: var(--line); font-size: 11px; }
+    .readmore { padding: 7px 4px 7px 8px; border-color: transparent; background: transparent; color: var(--accent); font-size: 11px; font-weight: 850; }
+    .readmore:hover { background: var(--surface-raised); }
+    .page-title { margin: 7px 0 8px; font-size: clamp(30px, 5vw, 45px); line-height: 1.1; letter-spacing: -.05em; }
+    .muted { color: var(--muted); }
+    .chatbox { height: 420px; overflow: auto; padding: 17px; display: flex; flex-direction: column; gap: 10px; scroll-behavior: auto; overscroll-behavior: contain; }
+    .msg { max-width: min(82%, 680px); padding: 10px 13px; border: 1px solid var(--line); border-radius: 13px; background: var(--surface-soft); white-space: pre-wrap; overflow-wrap: anywhere; }
+    .msg.mine { align-self: flex-end; background: color-mix(in srgb, var(--accent) 10%, var(--surface)); border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+    .msg small { display: block; margin-bottom: 5px; color: var(--muted); font-size: 10px; }
+    .msg-content { display: block; }
+    .msg-actions { display:flex; justify-content:flex-end; margin-top:7px; }
+    .msg-delete { border:1px solid var(--line); border-radius:6px; padding:4px 7px; background:var(--surface); color:var(--danger); font-size:10px; }
+    .chatform { display: flex; gap: 9px; padding: 13px; border-top: 1px solid var(--line); }
+    .chatform .field { flex: 1; }
+    .ruleslist { display: grid; gap: 11px; margin-top: 22px; }
+    .rule { display: flex; align-items: flex-start; gap: 15px; padding: 17px; }
+    .rule b { flex: 0 0 auto; color: var(--accent); font-size: 19px; }
+    .rule p { margin: 5px 0 0; color: var(--muted); line-height: 1.7; }
+    .adminlayout { display: grid; grid-template-columns: 205px minmax(0, 1fr); gap: 15px; margin-top: 20px; }
+    .adminnav { align-self: start; position: sticky; top: 88px; padding: 9px; }
+    .adminnav button { display: block; width: 100%; margin: 2px 0; text-align: left; }
+    .admincontent { min-width: 0; min-height: 420px; padding: 21px; }
+    .adminsection { display: none; }
+    .adminsection.active { display: block; }
+    .adminsection h2 { margin: 0 0 18px; font-size: 21px; }
+    .formgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .formgrid .full { grid-column: 1 / -1; }
+    label { display: block; margin: 0 0 6px; color: var(--muted); font-size: 11px; font-weight: 800; }
+    .tablewrap { width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    td, th { padding: 11px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+    th { color: var(--muted); font-weight: 750; white-space: nowrap; }
+    td { overflow-wrap: anywhere; }
+    .role { display: inline-block; padding: 4px 7px; border-radius: 6px; background: var(--surface-soft); color: var(--accent); font-size: 9px; font-weight: 900; letter-spacing: .05em; }
+    .empty { grid-column: 1 / -1; padding: 34px 18px; border: 1px dashed var(--line); border-radius: var(--radius); color: var(--muted); text-align: center; }
+    .notice { padding: 13px 14px; border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: 10px; background: var(--surface-soft); color: var(--muted); font-size: 12px; line-height: 1.65; }
+    .modalback { position: fixed; inset: 0; z-index: 200; display: none; align-items: center; justify-content: center; padding: 18px; background: #080d14cc; }
+    .modalback.show { display: flex; }
+    .modal { width: min(680px, 100%); max-height: 88vh; overflow: auto; padding: 22px; border: 1px solid var(--line); border-radius: 19px; background: var(--surface); }
+    .modalhead { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .modal h2 { margin: 2px 0 17px; font-size: 23px; line-height: 1.25; }
+    .modalbody { color: var(--muted); line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .code { overflow: auto; padding: 14px; border: 1px solid var(--line); border-radius: 11px; background: var(--surface-soft); color: var(--text); font: 12px/1.7 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre-wrap; }
+    .toastarea { position: fixed; right: 16px; bottom: 16px; z-index: 300; display: grid; gap: 7px; width: min(350px, calc(100vw - 32px)); pointer-events:none; }
+    .toast { padding: 11px 14px; border: 1px solid var(--line); border-radius: 11px; background: var(--surface-raised); color: var(--text); font-size: 12px; pointer-events:auto; box-shadow:0 8px 25px #00000016; }
+    .toast.error { border-left: 3px solid var(--danger); }
+    .toast.ok { border-left: 3px solid var(--success); }
+    .footer { margin-top: 5px; padding: 22px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
+    .footer-inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    .hidden { display: none !important; }
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; padding-top: 42px; gap: 25px; }
+      .hero-art { min-height: 260px; }
+      .nav { display: none; position: absolute; top: 71px; left: 0; right: 0; padding: 11px 20px; flex-wrap: wrap; background: var(--bg); border-bottom: 1px solid var(--line); }
+      .nav.open { display: flex; max-height: min(72vh, 440px); overflow-y: auto; }
+      .mobilemenu { display: inline-flex; }
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 620px) {
+      .wrap { width: calc(100% - 24px); }
+      .topinner { min-height: 66px; gap: 8px; }
+      .brandname { font-size: 14px; }
+      .brandmark { width: 36px; height: 36px; }
+      .actions { gap: 5px; }
+      .actions .profilelabel, .admin-entry-label { display: none; }
+      .actions .btn { padding-inline: 10px; }
+      .nav { top: 65px; padding: 10px 12px; gap: 6px; }
+      .nav button { flex: 1 1 calc(50% - 6px); min-height: 42px; text-align: center; }
+      .hero { min-height: auto; padding: 35px 0 24px; }
+      .hero h1 { font-size: clamp(40px, 12vw, 50px); }
+      .hero-copy { font-size: 14px; }
+      .hero-art { min-height: 225px; }
+      .art-core { width: 100px; height: 100px; font-size: 40px; }
+      .art-orbit { width: 205px; height: 90px; }
+      .art-orbit.second { width: 230px; height: 105px; }
+      .art-orbit.third { width: 180px; height: 180px; }
+      .art-label { font-size: 9px; padding: 7px 8px; }
+      .sectionhead { align-items: flex-start; flex-direction: column; }
+      .sectionhead h2 { font-size: 23px; }
+      .grid { grid-template-columns: 1fr; }
+      .page { padding-top: 26px; }
+      .adminlayout { grid-template-columns: 1fr; }
+      .adminnav { position: static; display: flex; overflow-x: auto; gap: 4px; }
+      .adminnav button { width: auto; white-space: nowrap; }
+      .admincontent { padding: 14px; }
+      .formgrid { grid-template-columns: 1fr; }
+      .formgrid .full { grid-column: auto; }
+      .chatform { padding: 9px; }
+      .chatform .btn { padding-inline: 11px; }
+      .stats { gap: 8px; margin-bottom: 35px; }
+      .stat { padding: 13px; }
+      .stat b { font-size: 22px; }
+      .chatbox { height: 390px; padding: 11px; }
+      .msg { max-width: 92%; }
+      .modal { padding: 17px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+
+    .catalog-tabs { padding: 3px 0 8px; border-bottom: 1px solid var(--line); gap: 7px; }
+    .catalog-tabs .chip { white-space: nowrap; }
+    .catalog-card-top { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; }
+    .catalog-download-count { white-space:nowrap; font-size:10px; }
+    .download-version { background:var(--surface-soft); }
+    .download-file-top { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px; }
+    .mod-card { transition:border-color .15s ease, background-color .15s ease; }
+    .mod-card:hover { background:var(--surface-raised); }
+    .repo-tools { grid-template-columns:minmax(200px,1fr) minmax(150px,190px) minmax(150px,190px) minmax(145px,170px) auto; }
+    .field:disabled { opacity:.55; cursor:not-allowed; }
+    .ai-fab { border-color:#dfb6c6; background:#f7e5ec; color:#87415f; }
+    .ai-fab:focus-visible { outline-color:#b85f83; }
+    .ai-msg.user { background:#f8e7ee; border-color:#e9c7d5; }
+    @media(max-width:850px) { .repo-tools { grid-template-columns:1fr 1fr; } }
+    @media(max-width:620px) { .repo-tools { grid-template-columns:1fr; } .catalog-tabs { overflow-x:auto; flex-wrap:nowrap; padding-bottom:10px; } .catalog-tabs .chip { flex:0 0 auto; } }
+    @media(min-width:851px) { .repo-tools { grid-template-columns:minmax(200px,1fr) minmax(145px,180px) minmax(140px,180px) minmax(145px,170px) auto; } }
+
+    /* Sakura / GitHub-inspired interface */
+    :root {
+      color-scheme: light;
+      --bg: #fff8fb;
+      --surface: #ffffff;
+      --surface-raised: #fff5f8;
+      --surface-soft: #fff1f5;
+      --text: #24232a;
+      --muted: #6e6870;
+      --line: #eadde3;
+      --accent: #b85f83;
+      --accent-strong: #9f4e70;
+      --accent-ink: #ffffff;
+      --pink: #e7a9c0;
+      --danger: #b54755;
+      --success: #3c8060;
+      --radius: 13px;
+      --radius-small: 9px;
+      --content: 1240px;
+    }
+    [data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #201a20;
+      --surface: #2a222a;
+      --surface-raised: #332832;
+      --surface-soft: #30252e;
+      --text: #f6edf2;
+      --muted: #c0adb8;
+      --line: #51404b;
+      --accent: #e1a0ba;
+      --accent-strong: #efb4ca;
+      --accent-ink: #2b1c25;
+      --pink: #bd7794;
+      --danger: #ee929d;
+      --success: #93c9a9;
+    }
+    body { background: var(--bg); font-size: 14px; }
+    .topbar { background: color-mix(in srgb, var(--surface) 96%, transparent); }
+    .brandmark { border-radius: 10px; background: #f4dce6; color: #8f4264; border: 1px solid #e8c6d4; }
+    .brandname { letter-spacing: .08em; }
+    .brandname small { letter-spacing: .12em; }
+    .nav button, .adminnav button { border-radius: 8px; }
+    .btn { border-radius: 8px; box-shadow: none; }
+    .btn:hover { filter: brightness(.98); }
+    .panel, .stat, .hero-art { box-shadow: none; }
+    .hero { min-height: 385px; padding-top: 42px; }
+    .hero h1 { letter-spacing: -.045em; }
+    .hero-art { border-radius: 16px; background: linear-gradient(145deg, var(--surface), var(--surface-soft)); }
+    .art-grid { opacity: .2; }
+    .art-orbit { opacity: .6; }
+    .art-core { transform: none; border-radius: 50%; background: #f8e6ed; color: #a14f72; border-color: #e7bfd0; }
+    .art-core span { transform: none; }
+    .eyebrow { background: var(--surface); letter-spacing: .07em; }
+    .stat, .panel { border-radius: 12px; }
+    .post { border-radius: 11px; min-height: 230px; }
+    .post:hover { border-color: var(--pink); }
+    .field { border-radius: 8px; background: var(--surface); }
+    .chip { border-radius: 7px; }
+    .tag { border-radius: 6px; }
+    .footer { border-color: var(--line); }
+    .repo-head { display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; padding:16px 18px; border-bottom:1px solid var(--line); }
+    .repo-title { display:flex; align-items:center; gap:10px; font-weight:800; }
+    .repo-mark { width:30px; height:30px; display:grid; place-items:center; border:1px solid var(--line); border-radius:8px; background:var(--surface-soft); color:var(--accent); }
+    .repo-tools { display:grid; grid-template-columns:minmax(190px,1fr) 170px 155px 140px; gap:9px; margin:18px 0; }
+    .mod-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .mod-card { padding:15px; border:1px solid var(--line); border-radius:11px; background:var(--surface); min-width:0; }
+    .mod-card:hover { border-color:var(--pink); }
+    .mod-card-head { display:flex; align-items:flex-start; gap:12px; }
+    .mod-icon { width:46px; height:46px; flex:0 0 46px; object-fit:cover; border:1px solid var(--line); border-radius:9px; background:var(--surface-soft); }
+    .mod-card h3 { margin:0 0 4px; font-size:15px; overflow-wrap:anywhere; }
+    .mod-card p { margin:10px 0; color:var(--muted); font-size:12px; line-height:1.65; }
+    .mod-meta { display:flex; flex-wrap:wrap; gap:7px 13px; padding-top:10px; border-top:1px solid var(--line); color:var(--muted); font-size:10px; }
+    .mod-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+    .pager { display:flex; justify-content:center; align-items:center; gap:10px; margin:18px 0 4px; }
+    .ai-fab { position:fixed; right:20px; bottom:20px; z-index:150; width:58px; height:58px; border:1px solid #e4bfd0; border-radius:50%; background:#f5dce7; color:#87415f; font-size:25px; font-weight:800; box-shadow:none; }
+    .ai-fab:hover { background:#edc9d9; }
+    .ai-panel { position:fixed; right:20px; bottom:90px; z-index:151; width:min(390px,calc(100vw - 28px)); height:min(560px,calc(100vh - 120px)); display:none; flex-direction:column; overflow:hidden; border:1px solid var(--line); border-radius:15px; background:var(--surface); box-shadow:none; }
+    .ai-panel.open { display:flex; }
+    .ai-head { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:13px 15px; border-bottom:1px solid var(--line); }
+    .ai-feed { flex:1; min-height:0; overflow:auto; display:flex; flex-direction:column; gap:10px; padding:13px; }
+    .ai-msg { max-width:92%; padding:10px 12px; border:1px solid var(--line); border-radius:11px; background:var(--surface-soft); white-space:pre-wrap; overflow-wrap:anywhere; font-size:12px; line-height:1.65; }
+    .ai-msg.user { align-self:flex-end; background:#f8e7ee; color:#35232b; }
+    .ai-compose { display:flex; gap:8px; padding:11px; border-top:1px solid var(--line); }
+    .ai-compose textarea { min-height:42px; max-height:100px; resize:vertical; }
+    .upload-note { padding:12px 14px; border:1px solid var(--line); border-radius:9px; color:var(--muted); background:var(--surface-soft); font-size:11px; line-height:1.7; }
+    .file-name { max-width:250px; overflow-wrap:anywhere; }
+    @media(max-width:850px) { .repo-tools { grid-template-columns:1fr 1fr; } }
+    @media(max-width:620px) {
+      .repo-tools, .mod-grid { grid-template-columns:1fr; }
+      .ai-fab { width:54px; height:54px; right:13px; bottom:13px; }
+      .ai-panel { right:10px; bottom:77px; width:calc(100vw - 20px); height:min(72vh,560px); }
+      .repo-head { padding:13px; }
+    }
+
+    .auth-gate { position:fixed; inset:0; z-index:160; display:grid; place-items:center; padding:18px; overflow:auto; background:radial-gradient(circle at 15% 10%, #f6e3ec 0, transparent 36%), radial-gradient(circle at 90% 90%, #f0dce8 0, transparent 35%), var(--bg); }
+    .auth-gate.hidden { display:none !important; }
+    .auth-card { width:min(430px,100%); padding:30px; border:1px solid var(--line); border-radius:20px; background:var(--surface); box-shadow:0 18px 55px #50334418; }
+    .auth-brand { display:flex; align-items:center; gap:12px; margin-bottom:25px; }
+    .auth-brand strong { display:block; font-size:15px; letter-spacing:.1em; }
+    .auth-brand small { display:block; margin-top:4px; color:var(--muted); font-size:9px; letter-spacing:.16em; }
+    .auth-card h1 { margin:0 0 5px; font-size:30px; letter-spacing:-.04em; }
+    .auth-subtitle { margin:0 0 20px; color:var(--muted); }
+    .auth-switch { display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:4px; margin-bottom:20px; border:1px solid var(--line); border-radius:10px; background:var(--surface-soft); }
+    .auth-tab { min-height:38px; border:0; border-radius:7px; background:transparent; color:var(--muted); font-weight:800; }
+    .auth-tab.active { background:var(--surface); color:var(--accent); box-shadow:0 1px 5px #29172212; }
+    .auth-submit { width:100%; margin-top:19px; }
+    .auth-note,.auth-status { margin:14px 0 0; color:var(--muted); font-size:11px; line-height:1.6; }
+    .auth-status:empty { display:none; }
+    .auth-guest { width:100%; margin-top:10px; }
+    .owner-edge { position:fixed; z-index:75; top:43%; right:0; padding:13px 10px; border:1px solid #d9afc1; border-right:0; border-radius:11px 0 0 11px; background:#f5e0e9; color:#87415f; font-size:10px; font-weight:900; letter-spacing:.08em; writing-mode:vertical-rl; text-orientation:mixed; box-shadow:0 5px 18px #40253512; }
+    .owner-edge:hover { background:#edc9d9; }
+    @media(max-width:620px) { .auth-card { padding:23px 19px; } .owner-edge { top:46%; font-size:9px; padding:11px 8px; } }
+
+    /* Responsive grid for the unified catalog */
+    @media (min-width: 851px) {
+      .repo-tools { grid-template-columns: minmax(200px, 1fr) minmax(145px, 180px) minmax(140px, 180px) minmax(145px, 170px) auto; }
+    }
+    @media (max-width: 850px) { .repo-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 620px) { .repo-tools { grid-template-columns: minmax(0, 1fr); } }
+
+    /* Catalog polish and local file library */
+    .local-upload-section { margin:18px 0 22px; padding:18px; border:1px solid var(--line); border-radius:14px; background:var(--surface); }
+    .local-upload-heading,.local-library-head { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+    .local-upload-heading h2,.local-library-head h3 { margin:0; font-size:18px; letter-spacing:-.025em; }
+    .local-upload-heading p { margin:5px 0 0; font-size:12px; }
+    .local-upload-form { margin-top:16px; }
+    .upload-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .upload-field { min-width:0; }
+    .upload-field-wide { grid-column:1/-1; }
+    .upload-file-input { padding:8px; }
+    .upload-help { margin:6px 0 0; color:var(--muted); font-size:10px; }
+    .local-upload-actions { display:flex; align-items:center; flex-wrap:wrap; gap:9px; margin-top:13px; }
+    .local-upload-actions .muted { font-size:11px; }
+    .local-upload-note { margin-top:14px; }
+    .local-library-head { margin:22px 0 12px; }
+    .local-upload-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+    .local-upload-card { min-width:0; padding:14px; border:1px solid var(--line); border-radius:11px; background:var(--surface-raised); }
+    .local-upload-card h4 { margin:7px 0 4px; font-size:14px; overflow-wrap:anywhere; }
+    .local-upload-card p { margin:7px 0; color:var(--muted); font-size:11px; line-height:1.6; overflow-wrap:anywhere; }
+    .local-upload-meta { display:flex; flex-wrap:wrap; gap:6px 12px; padding-top:9px; border-top:1px solid var(--line); color:var(--muted); font-size:10px; }
+    .local-upload-card-actions { display:flex; gap:7px; flex-wrap:wrap; margin-top:10px; }
+    .mod-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    .mod-card { padding:16px; border-radius:13px; background:var(--surface); }
+    .mod-card-head { align-items:center; }
+    .mod-icon { width:54px; height:54px; flex-basis:54px; border-radius:12px; }
+    .mod-card h3 { font-size:16px; line-height:1.35; }
+    .mod-card p { margin:12px 0; font-size:12px; line-height:1.65; }
+    .mod-card .project-categories { display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
+    .project-categories .tag { font-size:9px; padding:4px 7px; }
+    .project-stats { display:flex; flex-wrap:wrap; gap:7px 14px; margin-top:8px; color:var(--muted); font-size:10px; }
+    .mod-actions .btn { text-decoration:none; display:inline-flex; align-items:center; justify-content:center; }
+    .version-group { margin:12px 0; padding:14px; border:1px solid var(--line); border-radius:12px; background:var(--surface); }
+    .version-group-head { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+    .version-group-head strong { color:var(--text); font-size:14px; }
+    .version-group-head small { color:var(--muted); font-size:10px; }
+    .version-group-meta { display:flex; flex-wrap:wrap; gap:6px; margin:9px 0 11px; }
+    .version-group-meta .tag { font-size:9px; }
+    .version-file-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 0; border-top:1px solid var(--line); }
+    .version-file-info { min-width:0; }
+    .version-file-info strong { display:block; color:var(--text); font-size:12px; overflow-wrap:anywhere; }
+    .version-file-info small { display:block; margin-top:3px; color:var(--muted); font-size:10px; }
+    .version-download { flex:0 0 auto; min-height:35px; padding:7px 11px; border:1px solid var(--accent); border-radius:8px; background:var(--accent); color:var(--accent-ink); font-size:11px; font-weight:850; text-decoration:none; }
+    .version-download:hover { background:var(--accent-strong); }
+    .modrinth-source-note { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; align-items:center; }
+    @media(max-width:850px) { .mod-grid,.local-upload-grid { grid-template-columns:1fr; } }
+    @media(max-width:620px) { .local-upload-section { padding:13px; } .upload-fields { grid-template-columns:1fr; } .upload-field-wide { grid-column:auto; } .version-file-row { align-items:flex-start; } .version-download { padding-inline:9px; } }
+  </style>
+</head>
+<body>
+  <section class="auth-gate" id="authGate" aria-label="Авторизация RAGNAROKRITH">
+    <div class="auth-card">
+      <div class="auth-brand"><span class="brandmark">R</span><div><strong>RAGNAROKRITH</strong><small>АККАУНТ СООБЩЕСТВА</small></div></div>
+      <h1 id="authTitle">Вход</h1>
+      <p class="auth-subtitle" id="authSubtitle">Войдите по никнейму и паролю.</p>
+      <div class="auth-switch">
+        <button class="auth-tab active" id="authLoginTab" type="button" data-auth-mode="login">Вход</button>
+        <button class="auth-tab" id="authRegisterTab" type="button" data-auth-mode="register">Регистрация</button>
+      </div>
+      <form id="authForm" autocomplete="on">
+        <label for="authNick">Никнейм</label>
+        <input class="field" id="authNick" name="username" minlength="3" maxlength="24" autocomplete="username" placeholder="Введите никнейм" required>
+        <label for="authPass" style="margin-top:13px">Пароль</label>
+        <input class="field" id="authPass" name="password" type="password" minlength="8" maxlength="72" autocomplete="current-password" placeholder="Введите пароль" required>
+        <button class="btn auth-submit" id="authSubmit" type="submit">Войти</button>
+      </form>
+      <button class="btn secondary auth-guest" id="guestContinue" type="button">Mehmon sifatida davom etish</button>
+      <p class="auth-note" id="authHint">Для нового аккаунта выберите вкладку «Регистрация».</p>
+      <p class="auth-status" id="authStatus" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+  <button class="owner-edge" type="button" data-action="admin-entry" aria-label="Открыть панель владельца">OWNER PANEL ⚙</button>
+  <a class="skip-link" href="#main">Перейти к содержимому</a>
+  <header class="topbar">
+    <div class="wrap topinner">
+      <a class="brand" href="#home" data-action="go" data-page="home" aria-label="RAGNAROKRITH — главная">
+        <span class="brandmark" aria-hidden="true">R</span>
+        <span class="brandname">RAGNAROKRITH<small>КАТАЛОГ MINECRAFT</small></span>
+      </a>
+      <nav class="nav" id="nav" aria-label="Главная навигация">
+        <button class="active" type="button" data-action="go" data-page="home">Главная</button>
+        <button type="button" data-action="go" data-page="mods">RAGNAROKRITH</button>
+        <button type="button" data-action="go" data-page="chat">Общий чат</button>
+        <button type="button" data-action="go" data-page="rules">Правила</button>
+      </nav>
+      <div class="actions">
+        <button class="iconbtn mobilemenu" type="button" data-action="toggle-menu" aria-label="Открыть меню" aria-expanded="false">☰</button>
+        <button class="iconbtn" type="button" data-action="toggle-theme" aria-label="Сменить тему" title="Сменить тему">◐</button>
+        <button class="iconbtn" type="button" data-action="logout-user" title="Выйти из аккаунта">♙ <span class="profilelabel" id="username">Гость</span></button>
+        <button class="btn small" type="button" data-action="admin-entry" aria-label="Панель владельца" title="Панель владельца"><span class="admin-entry-label">OWNER</span><span aria-hidden="true">⚙</span></button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap" id="main">
+    <section class="page active" id="page-home" aria-labelledby="home-title">
+      <div class="hero">
+        <div>
+          <div class="eyebrow"><span class="status-dot" aria-hidden="true"></span> Система активна · RAGNAROKRITH</div>
+          <h1 id="home-title">Твой каталог<br><span class="accent-text">Minecraft</span> без границ.</h1>
+          <p class="hero-copy">Единое место для модов, модпаков, ресурспаков, шейдеров и плагинов Minecraft. Выбирай версию игры и загрузчик, сравнивай проекты и скачивай файлы напрямую от авторов.</p>
+          <div class="hero-cta">
+            <button class="btn" type="button" data-action="go" data-page="mods">Открыть RAGNAROKRITH ↗</button>
+            <button class="btn secondary" type="button" data-action="go" data-page="chat">Общий чат</button>
+          </div>
+        </div>
+        <div class="hero-art" aria-label="Геометрическая иллюстрация RAGNAROKRITH">
+          <div class="art-grid" aria-hidden="true"></div>
+          <div class="art-orbit" aria-hidden="true"></div>
+          <div class="art-orbit second" aria-hidden="true"></div>
+          <div class="art-orbit third" aria-hidden="true"></div>
+          <div class="art-core" aria-hidden="true"><span>R</span></div>
+          <span class="art-label one">✦ СИСТЕМА АКТИВНА</span>
+          <span class="art-label two">⌘ СОЗДАВАЙ · ДЕЛИСЬ</span>
+          <span class="art-label three">АНИМЕ × ТЕХНОЛОГИИ</span>
+        </div>
+      </div>
+
+      <div class="stats" aria-label="Статистика сообщества">
+        <div class="stat"><b id="statPosts">0</b><span>Публикаций</span></div>
+        <div class="stat"><b id="statMembers">0</b><span>Участников на устройстве</span></div>
+        <div class="stat"><b id="statMessages">0</b><span>Сообщений</span></div>
+        <div class="stat"><b>24/7</b><span>Цифровая атмосфера</span></div>
+      </div>
+
+      <div id="feed">
+        <div class="sectionhead">
+          <div><h2>Лента сообщества</h2><p>Свежие идеи, заметки и полезные материалы.</p></div>
+          <button class="btn secondary small" type="button" data-action="new-post">＋ Новая публикация</button>
+        </div>
+        <div class="feedtools">
+          <input id="search" class="field search" type="search" placeholder="⌕  Поиск по публикациям..." aria-label="Поиск по публикациям">
+          <div class="chips" id="categories" aria-label="Категории публикаций"></div>
+        </div>
+        <div class="grid" id="posts" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-chat" aria-labelledby="chat-title">
+      <div class="sectionhead">
+        <div><div class="eyebrow">СООБЩЕСТВО RAGNAROKRITH</div><h1 class="page-title" id="chat-title">Общий чат</h1><p class="muted">Общайся уважительно и соблюдай правила сообщества.</p></div>
+      </div>
+      <div class="panel">
+        <div class="chatbox" id="chatMessages" role="log" aria-live="polite" aria-relevant="additions"></div>
+        <form class="chatform" id="chatForm">
+          <input id="chatInput" class="field" maxlength="500" autocomplete="off" placeholder="Написать сообщение..." aria-label="Текст сообщения" required>
+          <button class="btn" type="submit">Отправить ↗</button>
+        </form>
+      </div>
+      <p class="muted" style="font-size:11px;margin:10px 2px 0">Чат сохраняется на этом устройстве в текущем браузере. Для общего чата между разными устройствами нужен сервер.</p>
+    </section>
+
+    <section class="page" id="page-rules" aria-labelledby="rules-title">
+      <div class="eyebrow">ПРАВИЛА СООБЩЕСТВА</div>
+      <h1 class="page-title" id="rules-title">Правила сообщества</h1>
+      <p class="muted">Общие принципы, которые помогают RAGNAROKRITH оставаться безопасным и дружелюбным местом.</p>
+      <div class="ruleslist" id="rulesList"></div>
+    </section>
+
+    <section class="page" id="page-mods" aria-labelledby="mods-title">
+      <div class="eyebrow">ЕДИНЫЙ КАТАЛОГ · ИСТОЧНИК MODRINTH</div>
+      <h1 class="page-title" id="mods-title">RAGNAROKRITH</h1>
+      <p class="muted">Моды, модпаки, ресурспаки, шейдеры и плагины — в одном каталоге. Поиск использует все доступные версии Minecraft и список загрузчиков Modrinth.</p>
+      <div class="panel" style="overflow:hidden;margin-top:20px">
+        <div class="repo-head"><div class="repo-title"><span class="repo-mark">✿</span><span>RAGNAROKRITH / КАТАЛОГ MINECRAFT</span><span class="tag">Открытый каталог</span></div><a href="https://modrinth.com/discover/mods" target="_blank" rel="noopener noreferrer" class="muted" style="font-size:11px">Открыть Modrinth ↗</a></div>
+      </div>
+      <div class="catalog-tabs chips" id="catalogTypes" aria-label="Типы проектов" style="margin:16px 0 12px">
+        <button class="chip active" type="button" data-action="catalog-type" data-type="all" aria-pressed="true">Всё</button>
+        <button class="chip" type="button" data-action="catalog-type" data-type="mod" aria-pressed="false">Моды</button>
+        <button class="chip" type="button" data-action="catalog-type" data-type="modpack" aria-pressed="false">Модпаки</button>
+        <button class="chip" type="button" data-action="catalog-type" data-type="resourcepack" aria-pressed="false">Ресурспаки</button>
+        <button class="chip" type="button" data-action="catalog-type" data-type="shader" aria-pressed="false">Шейдеры</button>
+        <button class="chip" type="button" data-action="catalog-type" data-type="plugin" aria-pressed="false">Плагины</button>
+        <button class="chip" type="button" data-action="catalog-type" data-type="datapack" aria-pressed="false">Датапаки</button>
+      </div>
+      <div class="repo-tools">
+        <input id="modSearch" class="field" type="search" placeholder="Найти мод, ресурспак, шейдер или плагин…" aria-label="Поиск по каталогу">
+        <select id="modVersion" class="field" aria-label="Версия Minecraft"><option value="">Все версии Minecraft</option></select>
+        <select id="modLoader" class="field" aria-label="Загрузчик"><option value="">Все загрузчики</option></select>
+        <select id="modSort" class="field" aria-label="Сортировка"><option value="relevance">По релевантности</option><option value="downloads">По загрузкам</option><option value="follows">По подпискам</option><option value="updated">Недавно обновлённые</option><option value="newest">Сначала новые</option></select>
+        <button class="btn" type="button" data-action="search-mods">Найти</button>
+      </div>
+      <section class="local-upload-section" aria-labelledby="local-upload-title">
+        <div class="local-upload-heading">
+          <div>
+            <h2 id="local-upload-title">Загрузить свой файл</h2>
+            <p class="muted">Добавь собственный мод, модпак, ресурспак, шейдер или плагин в локальную библиотеку.</p>
+          </div>
+          <span class="tag">Локальная библиотека</span>
+        </div>
+        <form id="localUploadForm" class="local-upload-form">
+          <div class="upload-fields">
+            <div class="upload-field upload-field-wide">
+              <label for="localUploadTitle">Название проекта</label>
+              <input class="field" id="localUploadTitle" maxlength="100" placeholder="Например, My Survival Mod" required>
+            </div>
+            <div class="upload-field">
+              <label for="localUploadType">Тип проекта</label>
+              <select class="field" id="localUploadType" required>
+                <option value="mod">Мод</option><option value="modpack">Модпак</option><option value="resourcepack">Ресурспак</option><option value="shader">Шейдер</option><option value="plugin">Плагин</option><option value="datapack">Датапак</option>
+              </select>
+            </div>
+            <div class="upload-field">
+              <label for="localUploadVersion">Версия Minecraft</label>
+              <input class="field" id="localUploadVersion" maxlength="40" placeholder="Например, 1.21.1">
+            </div>
+            <div class="upload-field">
+              <label for="localUploadLoader">Загрузчик</label>
+              <input class="field" id="localUploadLoader" maxlength="60" placeholder="Fabric, Forge, NeoForge, Paper…">
+            </div>
+            <div class="upload-field">
+              <label for="localUploadRelease">Версия проекта</label>
+              <input class="field" id="localUploadRelease" maxlength="40" placeholder="Например, 1.0.0">
+            </div>
+            <div class="upload-field upload-field-wide">
+              <label for="localUploadDescription">Описание</label>
+              <textarea class="field" id="localUploadDescription" rows="3" maxlength="500" placeholder="Что делает этот проект? Совместимость и важные примечания."></textarea>
+            </div>
+            <div class="upload-field upload-field-wide">
+              <label for="localUploadFile">Файл проекта</label>
+              <input class="field upload-file-input" id="localUploadFile" type="file" accept=".jar,.zip,.mrpack,.mcpack,.mcaddon,.mcworld,.mcmeta,.json" required>
+              <p class="upload-help" id="localUploadFileInfo">Форматы: JAR, ZIP, MRPACK, MCPACK, MCADDON, MCWORLD, JSON. Максимум 250 МБ.</p>
+            </div>
+          </div>
+          <div class="local-upload-actions">
+            <button class="btn" type="submit" id="localUploadSubmit">Загрузить в библиотеку</button>
+            <button class="btn secondary" type="reset">Очистить</button>
+            <span class="muted" id="localUploadStatus" role="status" aria-live="polite"></span>
+          </div>
+        </form>
+        <div class="upload-note local-upload-note">Важно: файлы сохраняются в IndexedDB этого браузера и устройства. Они не отправляются на сервер и не становятся автоматически видны другим людям. Для публикации на Modrinth войдите в свой аккаунт на <a href="https://modrinth.com/dashboard" target="_blank" rel="noopener noreferrer">панели автора Modrinth</a>. Для общей библиотеки вашего сайта всем посетителям понадобится сервер или облачное хранилище.</div>
+        <div class="local-library-head"><h3>Моя библиотека</h3><span class="muted" id="localUploadCount">0 файлов</span></div>
+        <div id="localUploads" class="local-upload-grid" aria-live="polite"><div class="empty">Пока нет загруженных файлов.</div></div>
+      </section>
+      <div class="feedtools"><span class="tag">Все версии</span><span class="tag">Все загрузчики</span><span class="tag">Моды · Пакеты · Шейдеры · Плагины</span><span class="tag">Источник: Modrinth</span><span id="modResultsCount" class="muted" style="font-size:11px"></span></div>
+      <div class="notice" style="margin:12px 0">Выбирай тип проекта, версию Minecraft и загрузчик. Для ресурспаков и шейдеров фильтр загрузчика не применяется. Плагины ищутся по серверным загрузчикам, например Paper, Spigot, Bukkit и Velocity. Это один HTML-файл: установка пакетов не нужна, но для каталога требуется интернет.</div>
+      <div id="modStatus" class="muted" role="status" style="margin:12px 0">Подключаемся к каталогу Modrinth…</div>
+      <div class="mod-grid" id="modGrid" aria-live="polite"></div>
+      <div class="pager"><button class="btn secondary small" id="modPrev" type="button" data-action="mods-prev" disabled>← Назад</button><span id="modPageLabel" class="muted" style="font-size:11px">Страница 1</span><button class="btn secondary small" id="modNext" type="button" data-action="mods-next">Далее →</button></div>
+      <p class="muted" style="font-size:11px;margin-top:17px">RAGNAROKRITH — независимый интерфейс каталога, а не копия Modrinth. Названия, описания и файлы принадлежат авторам проектов. Скачивание выполняется по прямым ссылкам Modrinth; доступность зависит от самого источника и подключения к интернету.</p>
+    </section>
+
+    <section class="page" id="page-admin" aria-labelledby="admin-title">
+      <div class="eyebrow">ЦЕНТР УПРАВЛЕНИЯ · ДОСТУП ВЛАДЕЛЬЦА</div>
+      <h1 class="page-title" id="admin-title">Панель управления</h1>
+      <p class="muted" id="adminWelcome">Войдите с правами владельца, чтобы управлять сообществом.</p>
+      <div id="adminGate" class="panel" style="padding:22px;max-width:520px;margin-top:20px">
+        <h3 style="margin-top:0">Доступ только владельцу</h3>
+        <p class="muted">Войдите в аккаунт <strong>Kryptonka07</strong>, чтобы открыть инструменты управления.</p>
+        <div class="notice">Панель владельца доступна только после входа под именем владельца. Для входа используйте ник и пароль на экране авторизации.</div>
+      </div>
+
+      <div id="adminApp" class="adminlayout hidden">
+        <aside class="panel adminnav" aria-label="Разделы панели управления">
+          <button class="active" type="button" data-action="admin-tab" data-tab="overview">▦ Обзор</button>
+          <button type="button" data-action="admin-tab" data-tab="posts">✎ Публикации</button>
+          <button type="button" data-action="admin-tab" data-tab="users">♙ Пользователи</button>
+          <button type="button" data-action="admin-tab" data-tab="moderation">⚑ Модерация</button>
+          <button type="button" data-action="admin-tab" data-tab="rules">☷ Правила</button>
+          <button type="button" data-action="admin-tab" data-tab="settings">⚙ Настройки</button>
+          <button type="button" data-action="logout">↪ Выйти</button>
+        </aside>
+        <div class="panel admincontent">
+          <div class="adminsection active" id="adm-overview">
+            <h2>Обзор системы</h2>
+            <div class="stats">
+              <div class="stat"><b id="admPostCount">0</b><span>Постов</span></div>
+              <div class="stat"><b id="admUserCount">0</b><span>Пользователей</span></div>
+              <div class="stat"><b id="admChatCount">0</b><span>Сообщений</span></div>
+              <div class="stat"><b id="admReportCount">0</b><span>Жалоб</span></div>
+            </div>
+            <p class="muted">Изменения сохраняются только в этом браузере. Регулярно создавайте резервные копии.</p>
+            <button class="btn secondary" type="button" data-action="export-data">Скачать резервную копию</button>
+            <button class="btn secondary" type="button" data-action="choose-import">Восстановить резервную копию</button>
+            <input id="importFile" type="file" accept="application/json,.json" class="hidden">
+          </div>
+
+          <div class="adminsection" id="adm-posts">
+            <h2>Управление публикациями</h2>
+            <form id="postForm" class="formgrid">
+              <input id="postId" type="hidden">
+              <div><label for="postTitle">Заголовок</label><input id="postTitle" class="field" required maxlength="100"></div>
+              <div><label for="postCategory">Категория</label><select id="postCategory" class="field"><option>Разработка</option><option>Искусственный интеллект</option><option>Дизайн</option><option>Аниме</option><option>Инструменты</option><option>Сообщество</option><option>Читы</option><option>Ресурспаки</option><option>Управление (телефон)</option><option>Моды и дополнения</option><option>Советы и гайды</option><option>Обновления</option><option>RAGNAROKRITH</option></select></div>
+              <div class="full"><label for="postExcerpt">Краткое описание</label><textarea id="postExcerpt" class="field" rows="2" required maxlength="240"></textarea></div>
+              <div class="full"><label for="postBody">Полный текст публикации</label><textarea id="postBody" class="field" rows="6" required maxlength="12000"></textarea></div>
+              <div class="full"><label for="postCode">Пример кода (необязательно)</label><textarea id="postCode" class="field" rows="4" maxlength="12000" placeholder="console.log('RAGNAROKRITH');"></textarea></div>
+              <div class="full"><button class="btn" type="submit">Сохранить публикацию</button> <button class="btn secondary" type="button" data-action="reset-post-form">Очистить</button></div>
+            </form>
+            <div class="tablewrap" style="margin-top:22px"><table><thead><tr><th>Публикация</th><th>Категория</th><th>Действия</th></tr></thead><tbody id="adminPostRows"></tbody></table></div>
+          </div>
+
+          <div class="adminsection" id="adm-users">
+            <h2>Пользователи и роли</h2>
+            <form id="userForm" class="formgrid">
+              <div><label for="newUser">Имя пользователя</label><input id="newUser" class="field" required maxlength="28"></div>
+              <div><label for="newRole">Роль</label><select id="newRole" class="field"><option value="MEMBER">Участник</option><option value="HELPER">Помощник</option><option value="ST MODERATOR">Младший модератор</option><option value="GL MODERATOR">Старший модератор</option><option value="ADMIN">Администратор</option></select></div>
+              <div class="full"><button class="btn" type="submit">Добавить пользователя</button></div>
+            </form>
+            <p class="muted" style="margin:14px 0">Роль владельца защищена от изменения через список пользователей.</p>
+            <div class="tablewrap"><table><thead><tr><th>Пользователь</th><th>Роль</th><th>Управление</th></tr></thead><tbody id="userRows"></tbody></table></div>
+          </div>
+
+          <div class="adminsection" id="adm-moderation">
+            <h2>Центр модерации</h2>
+            <p class="muted">Жалобы и заблокированные участники.</p>
+            <div class="tablewrap"><table><thead><tr><th>Жалоба</th><th>Автор</th><th>Причина</th><th>Статус</th><th></th></tr></thead><tbody id="reportRows"></tbody></table></div>
+            <h3 style="margin:22px 0 10px">Заблокированные участники</h3><div id="bannedRows"></div>
+          </div>
+
+          <div class="adminsection" id="adm-rules">
+            <h2>Редактор правил</h2>
+            <div id="ruleEditor"></div>
+            <button class="btn secondary" type="button" data-action="add-rule">＋ Добавить правило</button>
+            <button class="btn" type="button" data-action="save-rules">Сохранить правила</button>
+          </div>
+
+          <div class="adminsection" id="adm-settings">
+            <h2>Настройки проекта</h2>
+            <label for="siteTitle">Название сообщества</label><input id="siteTitle" class="field" maxlength="60" value="RAGNAROKRITH" style="margin-bottom:13px">
+            <label for="siteDescription">Описание</label><textarea id="siteDescription" class="field" rows="3" maxlength="300">Цифровая вселенная технологий, творчества и сообщества.</textarea>
+            <button class="btn" type="button" data-action="save-settings" style="margin-top:12px">Сохранить настройки</button>
+            <p class="muted" style="margin-top:20px">Сброс удалит локальные публикации, сообщения, роли и настройки. Сначала экспортируйте резервную копию.</p>
+            <button class="btn danger" type="button" data-action="reset-all">Сбросить локальные данные</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <span>© <span id="year"></span> RAGNAROKRITH</span>
+      <span>Пространство для идей, знаний и игрового сообщества</span>
+      <span id="saveState" role="status">● Локальное хранилище</span>
+    </div>
+  </footer>
+
+  <div class="modalback" id="modal" role="presentation">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modalhead"><h2 id="modalTitle"></h2><button class="iconbtn" type="button" data-action="close-modal" aria-label="Закрыть">✕</button></div>
+      <div id="modalBody" class="modalbody"></div>
+    </div>
+  </div>
+
+  <button class="ai-fab" id="aiFab" type="button" aria-label="Открыть ИИ-помощника" aria-expanded="false" title="ИИ-помощник">✿</button>
+  <section class="ai-panel" id="aiPanel" aria-label="ИИ-помощник" aria-hidden="true">
+    <div class="ai-head"><div><strong>✿ Помощник RAGNAROKRITH</strong><div class="muted" style="font-size:10px">Локальный справочник Minecraft</div></div><button class="iconbtn" type="button" id="aiClose" aria-label="Закрыть помощника">✕</button></div>
+    <div class="ai-feed" id="aiFeed" aria-live="polite"><div class="ai-msg">Привет! Я локальный помощник RAGNAROKRITH. Подскажу по модам, модпакам, ресурспакам, шейдерам, плагинам и загрузчикам Minecraft. Я работаю без облачного ИИ-сервера.</div></div>
+    <form class="ai-compose" id="aiForm"><textarea class="field" id="aiInput" maxlength="2000" rows="1" placeholder="Задай вопрос..." required></textarea><button class="btn" type="submit">➤</button></form>
+  </section>
+
+  <div class="toastarea" id="toasts" aria-live="polite" aria-atomic="true"></div>
+  <script>
+    'use strict';
+
+    const STORAGE_KEY = 'ragnarok_state_v5';
+    const LEGACY_KEY = 'ragnarok_state_v4';
+    const OLDER_LEGACY_KEY = 'ragnarok_state_v3';
+    const MAX_CHAT_MESSAGES = 1000;
+    const MAX_POSTS = 500;
+    const MAX_IMPORT_SIZE = 50 * 1024 * 1024;
+    const ROLES = ['MEMBER', 'HELPER', 'ST MODERATOR', 'GL MODERATOR', 'ADMIN', 'OWNER'];
+    const ROLE_LEVEL = { MEMBER: 0, HELPER: 1, 'ST MODERATOR': 2, 'GL MODERATOR': 3, ADMIN: 4, OWNER: 5 };
+    const ROLE_LABELS = { MEMBER: 'Участник', HELPER: 'Помощник', 'ST MODERATOR': 'Младший модератор', 'GL MODERATOR': 'Старший модератор', ADMIN: 'Администратор', OWNER: 'Владелец', SYSTEM: 'Система' };
+    function roleLabel(role) { return ROLE_LABELS[role] || 'Участник'; }
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+
+    const seedPosts = [
+      { id: 'p1', title: 'Как начать путь в веб-разработке', category: 'Разработка', excerpt: 'Понятный маршрут от первых строк HTML до интерактивных веб-приложений.', body: 'Начни с HTML: изучи семантическую разметку и структуру страницы. Затем переходи к CSS: Flexbox, Grid, адаптивность и доступность. После этого осваивай JavaScript: переменные, функции, массивы, объекты, DOM и асинхронность.\n\nСобери несколько небольших проектов: портфолио, список задач и каталог карточек. Размещай код в GitHub и описывай, чему научился. Регулярная практика важнее попытки выучить всё за один день.', code: 'const roadmap = ["HTML", "CSS", "JavaScript", "Git", "Projects"];\nroadmap.forEach((step, index) => console.log(index + 1, step));', likes: 18, createdAt: Date.now() - 7200000 },
+      { id: 'p2', title: 'Нейросети как помощники в учёбе и проектах', category: 'Искусственный интеллект', excerpt: 'Как использовать ИИ осознанно: идеи, объяснения, проверка и планирование.', body: 'ИИ может объяснять сложные темы простыми словами, предлагать варианты структуры проекта, помогать находить ошибки и составлять план обучения. Но результат всегда нужно проверять: модель может ошибаться или придумывать факты.\n\nХороший запрос содержит контекст, цель, ограничения и желаемый формат ответа. Не отправляй в публичные сервисы пароли, личные документы и конфиденциальные данные.', code: 'Задача: объясни тему простыми словами.\nКонтекст: я изучаю JavaScript.\nФормат: 3 примера + короткое резюме.', likes: 25, createdAt: Date.now() - 5400000 },
+      { id: 'p3', title: 'Цвет, контраст и визуальная иерархия', category: 'Дизайн', excerpt: 'Три принципа, которые делают интерфейс понятнее и красивее.', body: 'Ограниченная палитра помогает создать цельный стиль. Выбери основной цвет, один-два акцентных и нейтральные оттенки. Контраст текста и фона должен оставаться достаточным.\n\nВизуальная иерархия строится через размер, насыщенность, интервалы и положение элементов. Пользователь должен быстро понимать, что главное и куда нажимать. Не используй анимацию там, где она мешает чтению.', code: ':root {\n  --bg: #10151d;\n  --text: #edf2f7;\n  --accent: #69d2c4;\n}', likes: 14, createdAt: Date.now() - 4200000 },
+      { id: 'p4', title: 'Аниме-эстетика в современном веб-дизайне', category: 'Аниме', excerpt: 'Как вдохновляться аниме, не превращая сайт в перегруженный экран эффектов.', body: 'Используй выразительную типографику, чистые геометрические формы и небольшие иллюстративные детали. Оставляй достаточно свободного пространства.\n\nЛучше один сильный визуальный акцент, чем десятки движущихся элементов одновременно. Проверь интерфейс на телефоне и учитывай системную настройку уменьшения анимации.', code: '@media (prefers-reduced-motion: reduce) {\n  *, *::before, *::after {\n    scroll-behavior: auto !important;\n  }\n}', likes: 31, createdAt: Date.now() - 3300000 },
+      { id: 'p5', title: 'Git и GitHub: сохраняй историю проекта', category: 'Инструменты', excerpt: 'Базовые команды, которые помогают работать с версиями кода.', body: 'Git хранит историю изменений проекта. Создавай небольшие осмысленные коммиты, используй ветки для экспериментов и пиши понятные сообщения. GitHub помогает хранить репозитории и совместно работать над кодом.', code: 'git init\ngit add .\ngit commit -m "Первый коммит"\ngit branch -M main\ngit remote add origin <URL>\ngit push -u origin main', likes: 22, createdAt: Date.now() - 2600000 },
+      { id: 'p6', title: 'Пять полезных привычек разработчика', category: 'Разработка', excerpt: 'Маленькие привычки, которые делают работу спокойнее и эффективнее.', body: '1. Разбивай большую задачу на маленькие шаги.\n2. Проверяй изменения после каждого этапа.\n3. Читай сообщения об ошибках целиком.\n4. Делай понятные имена переменных и функций.\n5. Записывай решения, которые могут пригодиться позже.\n\nНе сравнивай свой темп с чужим: обучение — это процесс.', code: 'function greet(name) {\n  return `Привет, ${name}!`;\n}', likes: 17, createdAt: Date.now() - 1900000 },
+      { id: 'p7', title: 'Полезные инструменты для ежедневной работы', category: 'Инструменты', excerpt: 'Редактор кода, контроль версий, проверка доступности и документация.', body: 'Для старта пригодятся редактор кода, браузерные инструменты разработчика, Git, валидатор HTML и документация MDN. Для дизайна интерфейсов полезно изучить Figma. Выбирай инструменты под задачу, а не устанавливай всё подряд.', code: 'const tools = ["Code editor", "Browser DevTools", "Git", "MDN", "Figma"];\nconsole.table(tools);', likes: 12, createdAt: Date.now() - 1100000 },
+      { id: 'p8', title: 'RAGNAROKRITH: создаём сообщество вместе', category: 'Сообщество', excerpt: 'Предлагай темы, делись проектами и помогай поддерживать дружелюбную атмосферу.', body: 'RAGNAROKRITH — пространство для обмена знаниями и идеями. Публикуй полезные материалы, задавай вопросы, уважай других участников и сообщай модераторам о проблемах.\n\nСообщество становится лучше благодаря вкладу каждого участника.', code: 'console.log("Welcome to RAGNAROKRITH");', likes: 40, createdAt: Date.now() - 500000 },
+      { id: 'p9', title: 'Полезные команды Minecraft для своего мира', category: 'Читы', excerpt: 'Подборка игровых команд для творческого режима и настройки собственного мира.', body: 'Команды работают в мире, где владелец разрешил использование читов. Используй их в одиночном мире или на сервере, где правила прямо разрешают команды.\n\n/gamemode creative — переключиться в творческий режим.\n/time set day — установить день.\n/weather clear — убрать дождь.\n/give @s diamond 1 — выдать себе один алмаз.\n/tp @s 0 80 0 — переместиться к указанным координатам.\n\nЧтобы включить команды в новом мире Bedrock, активируй параметр «Читы» в настройках мира. На серверах всегда соблюдай правила администрации.', code: '/gamemode creative\n/time set day\n/weather clear\n/give @s diamond 1', likes: 0, createdAt: Date.now() - 240000 },
+      { id: 'p10', title: 'Как установить ресурспак на телефон', category: 'Ресурспаки', excerpt: 'Пошаговая инструкция для Minecraft Bedrock на Android без установки сторонних приложений.', body: '1. Выбери ресурспак, совместимый с твоей версией Minecraft Bedrock.\n2. Скачай файл формата .mcpack из источника, которому доверяешь.\n3. Открой файл через Minecraft — игра должна импортировать набор ресурсов.\n4. Перейди в настройки мира → Наборы ресурсов → Мои наборы и активируй пак.\n5. Перезапусти мир, если изменения не появились.\n\nПеред установкой проверь версию игры, описание и отзывы. Не скачивай неизвестные APK и не отключай защиту телефона ради ресурспака.', code: 'Формат файла: .mcpack\nРаздел игры: Настройки мира → Наборы ресурсов', likes: 0, createdAt: Date.now() - 180000 },
+      { id: 'p11', title: 'Удобное управление Minecraft на телефоне', category: 'Управление (телефон)', excerpt: 'Настрой кнопки, чувствительность и расположение элементов под свой экран.', body: 'Открой Настройки → Сенсорное управление. В зависимости от версии игры названия пунктов могут немного отличаться.\n\n• Измени размер кнопок, чтобы по ним было удобно попадать пальцами.\n• Перемести кнопки прыжка, приседания и взаимодействия ближе к естественному положению пальцев.\n• Настрой чувствительность камеры постепенно и проверь её в безопасном мире.\n• Включи разделённое управление, если тебе удобнее отдельно целиться и ломать блоки.\n• Используй предпросмотр раскладки и сохрани вариант, к которому привык.\n\nСовет: меняй по одному параметру за раз. Так будет проще понять, какая настройка действительно удобна.', code: 'Настройки → Сенсорное управление → Настроить', likes: 0, createdAt: Date.now() - 120000 },
+      { id: 'p12', title: 'Дополнения Minecraft: как устанавливать безопасно', category: 'Моды и дополнения', excerpt: 'Проверь совместимость дополнения и не устанавливай подозрительные файлы.', body: 'Для Minecraft Bedrock используй дополнения, предназначенные именно для Bedrock и твоей версии игры. Файлы .mcaddon и .mcpack обычно открываются через Minecraft.\n\nПеред импортом прочитай описание, список изменений и комментарии. Не запускай неизвестные .exe и .apk ради установки модификаций. Сохрани копию важного мира до включения новых дополнений.', code: 'Проверь: версия игры · формат файла · источник · резервная копия мира', likes: 0, createdAt: Date.now() - 90000 },
+      { id: 'p13', title: 'Как повысить стабильность игры на телефоне', category: 'Советы и гайды', excerpt: 'Несколько настроек, которые помогают уменьшить нагрузку и сделать игру плавнее.', body: 'Если игра работает нестабильно, попробуй уменьшить дальность прорисовки и отключить ресурсоёмкие визуальные эффекты. Закрой ненужные приложения, освободи место в памяти и обновляй игру через официальный магазин.\n\nНе устанавливай неизвестные «ускорители» и APK с обещаниями чудесной производительности. После изменения настроек проверь игру и возвращай параметры постепенно.', code: 'Графика → Дальность прорисовки → снизить значение', likes: 0, createdAt: Date.now() - 60000 },
+      { id: 'p15', title: 'RAGNAROKRITH: единый каталог Minecraft', category: 'Моды и дополнения', excerpt: 'Моды, модпаки, ресурспаки, шейдеры и серверные плагины в одном месте.', body: 'RAGNAROKRITH использует открытый каталог Modrinth. Выбирай тип проекта, версию Minecraft и загрузчик. Перед установкой внимательно сверяй совместимость и требования автора. Кнопка скачивания ведёт к файлу, опубликованному автором проекта.', code: 'Источники: Modrinth API\nКатегории: моды · модпаки · ресурспаки · шейдеры · плагины', likes: 0, createdAt: Date.now() - 30000 },
+      { id: 'p14', title: 'Что нового в RAGNAROKRITH', category: 'Обновления', excerpt: 'Новые игровые разделы, подборки и инструкции для мобильных игроков.', body: 'В RAGNAROKRITH появились отдельные категории для чит-команд, ресурспаков и сенсорного управления на телефоне. Также добавлены разделы с дополнениями и советами по производительности.\n\nПредлагай темы для следующих материалов через публикации сообщества.', code: '', likes: 0, createdAt: Date.now() - 30000 }
+    ];
+
+    const defaultRules = [
+      { title: 'Уважение прежде всего', body: 'Не допускаются оскорбления, травля, угрозы и дискриминация. Обсуждай идеи, а не унижай людей.' },
+      { title: 'Без спама и мошенничества', body: 'Не публикуй массовую рекламу, фишинговые ссылки, вредоносные файлы и обманные предложения.' },
+      { title: 'Безопасность и приватность', body: 'Не раскрывай чужие личные данные и не публикуй пароли, токены или закрытые документы.' },
+      { title: 'Публикуй по теме', body: 'Добавляй понятные заголовки и категории. Указывай источник, если используешь чужие материалы.' },
+      { title: 'Следуй решениям модерации', body: 'Если публикация скрыта или удалена, обратись к модератору спокойно и предоставь контекст.' }
+    ];
+
+    const initialState = {
+      nickname: 'Kryptonka07', posts: seedPosts, chats: [{ id: 'c0', user: 'RAGNAROKRITH', role: 'SYSTEM', text: 'Добро пожаловать в RAGNAROKRITH! Представься и начни знакомство.', at: Date.now() }],
+      users: [{ name: 'Kryptonka07', role: 'MEMBER', banned: false }], reports: [], banned: [], rules: defaultRules,
+      theme: 'light', settings: { title: 'RAGNAROKRITH', description: 'Каталог модов, модпаков, ресурспаков, шейдеров и плагинов Minecraft.' }
+    };
+
+    // Существующая локальная авторизация сохранена. На статическом HTML это не серверная защита.
+    const AUTH_USERS_KEY = 'ragnarokrith_auth_users_v1';
+    const AUTH_SESSION_KEY = 'ragnarokrith_auth_session_v1';
+    const OWNER_NICK = 'Kryptonka07';
+    const OWNER_SALT = 'ragnarokrith-owner-v1';
+    const OWNER_HASH = 'a1b1660fb6c232d1dc693aa6ef89c1d0dbbb7cebe923b5aeeeff8f973780edac';
+    const GUEST_SESSION_VALUE = '__ragnarokrith_guest__';
+    let storagePersistent = true;
+    const transientStorage = new Map();
+    const storage = (() => {
+      let target = null;
+      try {
+        target = window.localStorage;
+        const testKey = '__ragnarokrith_storage_test__';
+        target.setItem(testKey, '1'); target.removeItem(testKey);
+      } catch (error) {
+        storagePersistent = false;
+        target = null;
+      }
+      return {
+        getItem(key) {
+          const name = String(key);
+          try { if (target) { const value = target.getItem(name); if (value !== null) return value; } }
+          catch (error) { storagePersistent = false; target = null; }
+          return transientStorage.has(name) ? transientStorage.get(name) : null;
+        },
+        setItem(key, value) {
+          const name = String(key), content = String(value);
+          try { if (target) { target.setItem(name, content); transientStorage.delete(name); return true; } }
+          catch (error) { storagePersistent = false; target = null; }
+          transientStorage.set(name, content);
+          return false;
+        },
+        removeItem(key) {
+          const name = String(key); transientStorage.delete(name);
+          try { if (target) target.removeItem(name); }
+          catch (error) { storagePersistent = false; target = null; }
+        }
+      };
+    })();
+    let authMode = 'login';
+
+    let state = loadState();
+    let currentCategory = 'Все';
+    let ownerSession = false;
+    let dbPromise = null;
+
+    function clone(value) { return JSON.parse(JSON.stringify(value)); }
+    function textValue(value, max = 12000) { return String(value ?? '').slice(0, max); }
+    function escapeHTML(value = '') {
+      return String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+    }
+    function makeId(prefix = 'id') {
+      return `${prefix}_${globalThis.crypto?.randomUUID ? crypto.randomUUID() : `${Date.now()}_${Math.random().toString(36).slice(2, 9)}`}`;
+    }
+    function validTimestamp(value) {
+      const number = Number(value);
+      return Number.isFinite(number) && number > 0 ? number : Date.now();
+    }
+    function normalizeState(data) {
+      const source = data && typeof data === 'object' && !Array.isArray(data) ? data : {};
+      const posts = Array.isArray(source.posts) ? source.posts.slice(0, MAX_POSTS).map((post, index) => ({
+        id: textValue(post?.id || `import_post_${index}`, 100), title: textValue(post?.title, 100),
+        category: textValue(post?.category || 'Сообщество', 60), excerpt: textValue(post?.excerpt, 240),
+        body: textValue(post?.body, 12000), code: textValue(post?.code, 12000),
+        likes: Math.max(0, Math.min(1000000, Number.parseInt(post?.likes, 10) || 0)), createdAt: validTimestamp(post?.createdAt)
+      })).filter(post => post.title && post.body) : clone(seedPosts);
+      const users = Array.isArray(source.users) ? source.users.slice(0, 2000).map(user => ({
+        name: textValue(user?.name, 28).trim() || 'Участник',
+        role: ROLES.includes(user?.role) ? user.role : 'MEMBER', banned: Boolean(user?.banned)
+      })) : clone(initialState.users);
+      if (!users.some(user => user.name === (source.nickname || 'Гость'))) users.push({ name: textValue(source.nickname || 'Гость', 28), role: 'MEMBER', banned: false });
+      const chats = Array.isArray(source.chats) ? source.chats.slice(-MAX_CHAT_MESSAGES).map((message, index) => ({
+        id: textValue(message?.id || `import_chat_${index}`, 100), user: textValue(message?.user || 'Участник', 28),
+        role: textValue(message?.role || 'MEMBER', 30), text: textValue(message?.text, 500), at: validTimestamp(message?.at)
+      })).filter(message => message.text) : clone(initialState.chats);
+      const rules = Array.isArray(source.rules) ? source.rules.slice(0, 100).map(rule => ({ title: textValue(rule?.title, 100), body: textValue(rule?.body, 1000) })).filter(rule => rule.title && rule.body) : clone(defaultRules);
+      const reports = Array.isArray(source.reports) ? source.reports.slice(0, 1000).map(report => ({
+        id: textValue(report?.id || makeId('report'), 100), postId: textValue(report?.postId, 100),
+        title: textValue(report?.title, 100), author: textValue(report?.author, 28),
+        reason: textValue(report?.reason, 500), status: report?.status === 'Рассмотрена' ? 'Рассмотрена' : 'Новая', at: validTimestamp(report?.at)
+      })) : [];
+      const banned = Array.isArray(source.banned) ? source.banned.slice(0, 2000).map(name => textValue(name, 28)).filter(Boolean) : [];
+      const settings = source.settings && typeof source.settings === 'object' ? source.settings : {};
+      const curatedIds = new Set(['p9', 'p10', 'p11', 'p12', 'p13', 'p14', 'p15']);
+      const postIds = new Set(posts.map(post => post.id));
+      const expandedPosts = [...posts, ...seedPosts.filter(post => curatedIds.has(post.id) && !postIds.has(post.id))].slice(0, MAX_POSTS);
+      return {
+        nickname: textValue(source.nickname || 'Гость', 28).trim() || 'Гость', posts: expandedPosts, users, chats, rules, reports,
+        banned: [...new Set(banned)], theme: source.theme === 'dark' ? 'dark' : 'light',
+        settings: { title: textValue(settings.title || 'RAGNAROKRITH', 60), description: textValue(settings.description || initialState.settings.description, 300) }
+      };
+    }
+    function loadState() {
+      try {
+        let raw = storage.getItem(STORAGE_KEY);
+        if (!raw) raw = storage.getItem(LEGACY_KEY);
+        if (!raw) raw = storage.getItem(OLDER_LEGACY_KEY);
+        if (!raw) return clone(initialState);
+        const parsed = JSON.parse(raw);
+        const result = normalizeState(parsed);
+        if (!storage.getItem(STORAGE_KEY)) storage.setItem(STORAGE_KEY, JSON.stringify(result));
+        return result;
+      } catch (error) {
+        console.error('Не удалось загрузить локальные данные:', error);
+        return clone(initialState);
+      }
+    }
+    function save() {
+      try {
+        const persisted = storage.setItem(STORAGE_KEY, JSON.stringify(state));
+        const status = $('#saveState');
+        if (status) status.textContent = persisted ? '● Изменения сохранены' : '● Временное хранение: браузер запретил постоянную запись';
+        if (!persisted) toast('Brauzer doimiy saqlashni blokladi. Sahifa yopilsa, yangi o‘zgarishlar yo‘qolishi mumkin.', 'error');
+        return Boolean(persisted);
+      } catch (error) {
+        console.error('Ошибка сохранения:', error);
+        toast('Не удалось сохранить данные. Экспортируйте резервную копию или освободите место.', 'error');
+        return false;
+      }
+    }
+    function toast(message, type = 'ok') {
+      const area = $('#toasts');
+      if (!area) return;
+      const element = document.createElement('div');
+      element.className = `toast ${type}`;
+      element.textContent = message;
+      area.append(element);
+      window.setTimeout(() => element.remove(), 3600);
+    }
+    function currentUser() { return state.nickname || 'Гость'; }
+    function currentRole() { return state.users.find(user => user.name === currentUser())?.role || 'MEMBER'; }
+    function canAdmin() { return ownerSession && currentRole() === 'OWNER'; }
+    function canModerateChat() { return Boolean(ownerSession || ROLE_LEVEL[currentRole()] >= ROLE_LEVEL.ADMIN); }
+    function isBanned(name = currentUser()) {
+      const user = state.users.find(item => item.name === name);
+      return Boolean(user?.banned || state.banned.includes(name));
+    }
+
+    function go(page) {
+      const target = $(`#page-${page}`);
+      if (!target) return;
+      $$('.page').forEach(section => section.classList.toggle('active', section === target));
+      $$('.nav [data-page]').forEach(button => button.classList.toggle('active', button.dataset.page === page));
+      $$('.nav [data-category-nav]').forEach(button => button.classList.toggle('active', page === 'home' && button.dataset.category === currentCategory));
+      $('#nav').classList.remove('open');
+      $('[data-action="toggle-menu"]')?.setAttribute('aria-expanded', 'false');
+      if (page === 'chat') renderChat();
+      if (page === 'rules') renderRules();
+      if (page === 'mods') { loadModrinthMods(true); renderLocalUploads(); }
+      if (page === 'admin') refreshAdmin();
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+    function toggleTheme() {
+      state.theme = state.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = state.theme;
+      $('meta[name="theme-color"]').content = state.theme === 'dark' ? '#201a20' : '#fff8fb';
+      save();
+    }
+    function updateStats() {
+      $('#statPosts').textContent = state.posts.length;
+      $('#statMembers').textContent = state.users.length;
+      $('#statMessages').textContent = state.chats.length;
+    }
+    function renderPosts() {
+      const query = ($('#search')?.value || '').trim().toLocaleLowerCase('ru');
+      const categories = ['Все', ...new Set(state.posts.map(post => post.category).filter(Boolean))];
+      if (!categories.includes(currentCategory)) currentCategory = 'Все';
+      $('#categories').innerHTML = categories.map(category => `<button type="button" class="chip${currentCategory === category ? ' active' : ''}" data-action="set-category" data-category="${escapeHTML(category)}" aria-pressed="${currentCategory === category}">${escapeHTML(category)}</button>`).join('');
+      const items = state.posts.filter(post => (currentCategory === 'Все' || post.category === currentCategory) && `${post.title} ${post.excerpt} ${post.category}`.toLocaleLowerCase('ru').includes(query)).sort((a, b) => b.createdAt - a.createdAt);
+      $('#posts').innerHTML = items.length ? items.map(post => `
+        <article class="panel post" data-id="${escapeHTML(post.id)}">
+          <div class="posttop"><span class="tag">${escapeHTML(post.category)}</span><span class="muted" style="font-size:10px">✦ RAGNAROKRITH</span></div>
+          <h3>${escapeHTML(post.title)}</h3>
+          <p>${escapeHTML(post.excerpt)}</p>
+          <div class="postmeta"><span>${new Date(post.createdAt).toLocaleDateString('ru-RU')}</span><span>♡ ${post.likes}</span></div>
+          <div class="postfoot"><div class="reactions">
+            <button class="reaction" type="button" data-action="like-post" data-id="${escapeHTML(post.id)}" aria-label="Нравится: ${escapeHTML(post.title)}">♡ ${post.likes}</button>
+            <button class="reaction" type="button" data-action="report-post" data-id="${escapeHTML(post.id)}">⚑ Жалоба</button>
+          </div><button class="readmore" type="button" data-action="read-post" data-id="${escapeHTML(post.id)}">Читать →</button></div>
+        </article>`).join('') : '<div class="empty">Ничего не найдено. Попробуй изменить запрос.</div>';
+      updateStats();
+    }
+    function setCategory(category) {
+      currentCategory = category;
+      $$('.nav [data-page]').forEach(button => button.classList.toggle('active', button.dataset.page === 'home' && category === 'Все'));
+      $$('.nav [data-category-nav]').forEach(button => button.classList.toggle('active', button.dataset.category === category));
+      renderPosts();
+    }
+    function goCategory(category) {
+      currentCategory = category;
+      go('home');
+      renderPosts();
+      $('#feed').scrollIntoView({ behavior: 'auto', block: 'start' });
+    }
+    function likePost(id) {
+      const post = state.posts.find(item => item.id === id);
+      if (!post) return;
+      post.likes = Math.min(1000000, (post.likes || 0) + 1);
+      save(); renderPosts();
+    }
+    function openModal(title, html) {
+      $('#modalTitle').textContent = title;
+      $('#modalBody').innerHTML = html;
+      $('#modal').classList.add('show');
+      $('[data-action="close-modal"]').focus();
+    }
+    function closeModal() { $('#modal').classList.remove('show'); }
+    function readPost(id) {
+      const post = state.posts.find(item => item.id === id);
+      if (!post) return;
+      const codeBlock = post.code ? `<h3 style="margin:20px 0 8px;color:var(--text)">Пример кода</h3><pre class="code" id="postCodeBlock">${escapeHTML(post.code)}</pre><button class="btn small" type="button" data-action="copy-code">Копировать код</button>` : '';
+      openModal(post.title, `<span class="tag">${escapeHTML(post.category)}</span><div style="margin-top:14px">${escapeHTML(post.body).replace(/\n/g, '<br>')}</div>${codeBlock}<div style="margin-top:22px"><button class="btn secondary small" type="button" data-action="report-post" data-id="${escapeHTML(post.id)}">Пожаловаться на публикацию</button></div>`);
+    }
+    async function copyText(value) {
+      try {
+        if (navigator.clipboard?.writeText && window.isSecureContext) await navigator.clipboard.writeText(value);
+        else {
+          const helper = document.createElement('textarea'); helper.value = value; helper.style.position = 'fixed'; helper.style.opacity = '0';
+          document.body.append(helper); helper.select();
+          const success = document.execCommand('copy'); helper.remove();
+          if (!success) throw new Error('Копирование недоступно');
+        }
+        toast('Скопировано');
+      } catch (error) { toast('Браузер не разрешил копирование', 'error'); }
+    }
+    function reportPost(id) {
+      const post = state.posts.find(item => item.id === id);
+      if (!post) return;
+      const reason = window.prompt('Укажи причину жалобы:');
+      if (!reason?.trim()) return;
+      state.reports.unshift({ id: makeId('report'), postId: id, title: post.title, author: currentUser(), reason: textValue(reason.trim(), 500), status: 'Новая', at: Date.now() });
+      save(); toast('Жалоба отправлена модераторам');
+    }
+    function openProfile() {
+      const value = window.prompt('Твоё имя в RAGNAROKRITH:', currentUser());
+      if (!value?.trim()) return;
+      const clean = value.trim().slice(0, 28);
+      if (state.users.some(user => user.name.toLocaleLowerCase('ru') === clean.toLocaleLowerCase('ru') && user.name !== currentUser())) return toast('Это имя уже занято', 'error');
+      const oldName = currentUser();
+      let user = state.users.find(item => item.name === oldName);
+      if (!user) { user = { name: clean, role: 'MEMBER', banned: false }; state.users.push(user); }
+      else user.name = clean;
+      state.chats.forEach(message => { if (message.user === oldName) message.user = clean; });
+      state.reports.forEach(report => { if (report.author === oldName) report.author = clean; });
+      state.banned = state.banned.map(name => name === oldName ? clean : name);
+      state.nickname = clean;
+      $('#username').textContent = clean;
+      save(); renderChat(); renderPosts(); toast('Профиль обновлён');
+    }
+
+    // Chat: render safely, keep the newest message visible, and expose delete only to moderators.
+    function renderChat() {
+      const box = $('#chatMessages');
+      if (!box) return;
+      const messages = state.chats.slice(-MAX_CHAT_MESSAGES);
+      box.innerHTML = messages.map(message => {
+        const canDelete = canModerateChat() && message.role !== 'SYSTEM';
+        return `<div class="msg${message.user === currentUser() ? ' mine' : ''}" data-message-id="${escapeHTML(message.id)}">
+          <small>${escapeHTML(message.user)} · ${escapeHTML(roleLabel(message.role || 'MEMBER'))} · ${new Date(message.at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}</small>
+          <span class="msg-content">${escapeHTML(message.text)}</span>
+          ${canDelete ? `<div class="msg-actions"><button class="msg-delete" type="button" data-action="delete-chat-message" data-id="${escapeHTML(message.id)}">Удалить</button></div>` : ''}
+        </div>`;
+      }).join('');
+      // Two frames help mobile browsers calculate the new scroll height after DOM updates.
+      requestAnimationFrame(() => {
+        box.scrollTop = box.scrollHeight;
+        requestAnimationFrame(() => { box.scrollTop = box.scrollHeight; });
+      });
+    }
+    function sendChat(event) {
+      event.preventDefault();
+      const input = $('#chatInput');
+      const message = input.value.trim();
+      if (!message) return;
+      if (isBanned()) return toast('Для аккаунта ограничена отправка сообщений', 'error');
+      const record = { id: makeId('chat'), user: currentUser(), role: currentRole(), text: textValue(message, 500), at: Date.now() };
+      state.chats.push(record);
+      state.chats = state.chats.slice(-MAX_CHAT_MESSAGES);
+      // Update the screen immediately; persistence follows synchronously in this same submit event.
+      input.value = '';
+      renderChat();
+      const saved = save();
+      renderPosts();
+      if (!saved) toast('Сообщение показано, но браузер не смог сохранить его локально.', 'error');
+      input.focus();
+    }
+    function deleteChatMessage(id) {
+      if (!canModerateChat()) return toast('Нужны права администратора или владельца.', 'error');
+      const index = state.chats.findIndex(message => message.id === id);
+      if (index < 0) return;
+      if (!window.confirm('Удалить это сообщение из локального чата?')) return;
+      state.chats.splice(index, 1);
+      save(); renderChat(); renderPosts(); refreshAdmin();
+      toast('Сообщение удалено');
+    }
+    function renderRules() {
+      $('#rulesList').innerHTML = state.rules.length ? state.rules.map((rule, index) => `<div class="panel rule"><b>${String(index + 1).padStart(2, '0')}</b><div><strong>${escapeHTML(rule.title)}</strong><p>${escapeHTML(rule.body)}</p></div></div>`).join('') : '<div class="empty">Правила пока не добавлены.</div>';
+    }
+
+    function readAuthUsers() {
+      try {
+        const parsed = JSON.parse(storage.getItem(AUTH_USERS_KEY) || '[]');
+        return Array.isArray(parsed) ? parsed.filter(item => item && typeof item.nick === 'string' && typeof item.salt === 'string' && typeof item.hash === 'string') : [];
+      } catch (_) { return []; }
+    }
+    function writeAuthUsers(users) {
+      storage.setItem(AUTH_USERS_KEY, JSON.stringify(users));
+    }
+    function bytesToHex(bytes) {
+      return [...bytes].map(byte => byte.toString(16).padStart(2, '0')).join('');
+    }
+    function utf8Bytes(value) {
+      if (typeof TextEncoder !== 'undefined') return new TextEncoder().encode(value);
+      const encoded = unescape(encodeURIComponent(value));
+      return Uint8Array.from(encoded, char => char.charCodeAt(0));
+    }
+    // Pure JavaScript SHA-256 fallback for file:// and browsers without crypto.subtle.
+    function sha256Fallback(input) {
+      const K = [
+        0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+        0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+        0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+        0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+        0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+        0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+        0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+        0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2
+      ];
+      const H = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+      const source = utf8Bytes(String(input));
+      const bitLength = source.length * 8;
+      const paddedLength = Math.ceil((source.length + 9) / 64) * 64;
+      const data = new Uint8Array(paddedLength);
+      data.set(source);
+      data[source.length] = 0x80;
+      const view = new DataView(data.buffer);
+      view.setUint32(paddedLength - 8, Math.floor(bitLength / 0x100000000), false);
+      view.setUint32(paddedLength - 4, bitLength >>> 0, false);
+      const rotr = (value, amount) => (value >>> amount) | (value << (32 - amount));
+      const words = new Uint32Array(64);
+      for (let offset = 0; offset < data.length; offset += 64) {
+        for (let i = 0; i < 16; i++) words[i] = view.getUint32(offset + i * 4, false);
+        for (let i = 16; i < 64; i++) {
+          const x = words[i - 15], y = words[i - 2];
+          const s0 = rotr(x, 7) ^ rotr(x, 18) ^ (x >>> 3);
+          const s1 = rotr(y, 17) ^ rotr(y, 19) ^ (y >>> 10);
+          words[i] = (words[i - 16] + s0 + words[i - 7] + s1) >>> 0;
+        }
+        let [a,b,c,d,e,f,g,h] = H;
+        for (let i = 0; i < 64; i++) {
+          const S1 = rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25);
+          const ch = (e & f) ^ (~e & g);
+          const t1 = (h + S1 + ch + K[i] + words[i]) >>> 0;
+          const S0 = rotr(a, 2) ^ rotr(a, 13) ^ rotr(a, 22);
+          const maj = (a & b) ^ (a & c) ^ (b & c);
+          const t2 = (S0 + maj) >>> 0;
+          h = g; g = f; f = e; e = (d + t1) >>> 0; d = c; c = b; b = a; a = (t1 + t2) >>> 0;
+        }
+        H[0]=(H[0]+a)>>>0; H[1]=(H[1]+b)>>>0; H[2]=(H[2]+c)>>>0; H[3]=(H[3]+d)>>>0;
+        H[4]=(H[4]+e)>>>0; H[5]=(H[5]+f)>>>0; H[6]=(H[6]+g)>>>0; H[7]=(H[7]+h)>>>0;
+      }
+      return H.map(word => word.toString(16).padStart(8, '0')).join('');
+    }
+    async function passwordHash(password, salt) {
+      const bytes = utf8Bytes(`${salt}:${password}`);
+      if (globalThis.crypto?.subtle?.digest) {
+        try {
+          const digest = await crypto.subtle.digest('SHA-256', bytes);
+          return bytesToHex(new Uint8Array(digest));
+        } catch (error) {
+          console.warn('crypto.subtle недоступен; используется JS SHA-256 fallback.', error);
+        }
+      }
+      return sha256Fallback(`${salt}:${password}`);
+    }
+    function makeSalt() {
+      try {
+        if (globalThis.crypto?.getRandomValues) {
+          const saltBytes = crypto.getRandomValues(new Uint8Array(16));
+          return bytesToHex(saltBytes);
+        }
+      } catch (_) { /* file:// fallback below */ }
+      let value = `${Date.now()}-${Math.random()}-${Math.random()}-${Math.random()}`;
+      return sha256Fallback(value).slice(0, 32);
+    }
+    function ensureOwnerAccount() {
+      const users = readAuthUsers();
+      const ownerIndex = users.findIndex(item => item.nick.toLocaleLowerCase('en') === OWNER_NICK.toLocaleLowerCase('en'));
+      const owner = { nick: OWNER_NICK, salt: OWNER_SALT, hash: OWNER_HASH, role: 'OWNER', createdAt: 1 };
+      if (ownerIndex >= 0) users[ownerIndex] = owner;
+      else users.push(owner);
+      writeAuthUsers(users);
+    }
+    function setAuthMode(mode) {
+      authMode = mode === 'register' ? 'register' : 'login';
+      const registering = authMode === 'register';
+      $('#authTitle').textContent = registering ? 'Создать аккаунт' : 'Вход';
+      $('#authSubtitle').textContent = registering ? 'Придумайте никнейм и пароль.' : 'Войдите по никнейму и паролю.';
+      $('#authSubmit').textContent = registering ? 'Зарегистрироваться' : 'Войти';
+      $('#authPass').autocomplete = registering ? 'new-password' : 'current-password';
+      $('#authHint').textContent = registering
+        ? 'Никнейм должен содержать 3–24 символа. Пароль — не менее 8 символов.'
+        : 'Нет аккаунта? Откройте вкладку «Регистрация».';
+      $('#authLoginTab').classList.toggle('active', !registering);
+      $('#authRegisterTab').classList.toggle('active', registering);
+      $('#authStatus').textContent = '';
+    }
+    function activateAccount(account) {
+      const isOwner = account.nick.toLocaleLowerCase('en') === OWNER_NICK.toLocaleLowerCase('en');
+      state.nickname = account.nick;
+      let user = state.users.find(item => item.name.toLocaleLowerCase('ru') === account.nick.toLocaleLowerCase('ru'));
+      if (!user) {
+        user = { name: account.nick, role: isOwner ? 'OWNER' : 'MEMBER', banned: false };
+        state.users.push(user);
+      } else {
+        user.name = account.nick;
+        if (isOwner) user.role = 'OWNER';
+        else if (user.role === 'OWNER') user.role = 'MEMBER';
+      }
+      ownerSession = isOwner;
+      // Вход владельца не восстанавливается только по сохранённому нику.
+      if (isOwner) storage.removeItem(AUTH_SESSION_KEY);
+      else storage.setItem(AUTH_SESSION_KEY, account.nick);
+      save();
+      $('#username').textContent = account.nick;
+      $('#authGate').classList.add('hidden');
+      $('#authPass').value = '';
+      refreshAdmin(); renderPosts(); renderChat(); updateStats();
+    }
+    function activateGuest() {
+      ownerSession = false;
+      state.nickname = 'Гость';
+      if (!state.users.some(user => user.name === 'Гость')) state.users.push({ name: 'Гость', role: 'MEMBER', banned: false });
+      storage.setItem(AUTH_SESSION_KEY, GUEST_SESSION_VALUE);
+      save();
+      $('#username').textContent = 'Гость';
+      $('#authGate').classList.add('hidden');
+      $('#authNick').value = '';
+      $('#authPass').value = '';
+      $('#authStatus').textContent = '';
+      refreshAdmin(); renderPosts(); renderChat(); updateStats();
+      toast('Mehmon sifatida kirdingiz. Chatdan foydalanishingiz mumkin.');
+    }
+    async function submitAuth(event) {
+      event.preventDefault();
+      const nick = $('#authNick').value.trim();
+      const password = $('#authPass').value;
+      const status = $('#authStatus');
+      const submit = $('#authSubmit');
+      status.textContent = '';
+      if (!/^[\p{L}\p{N}_-]{3,24}$/u.test(nick)) {
+        status.textContent = 'Никнейм: 3–24 буквы, цифры, подчёркивание или дефис.';
+        return;
+      }
+      if (password.length < 8 || password.length > 72) {
+        status.textContent = 'Пароль должен содержать от 8 до 72 символов.';
+        return;
+      }
+      submit.disabled = true;
+      try {
+        const isOwnerNick = nick.toLocaleLowerCase('en') === OWNER_NICK.toLocaleLowerCase('en');
+        let users = readAuthUsers();
+        if (authMode === 'register') {
+          if (isOwnerNick) throw new Error('Этот никнейм зарезервирован владельцем сайта.');
+          if (users.some(item => item.nick.toLocaleLowerCase('ru') === nick.toLocaleLowerCase('ru'))) throw new Error('Этот никнейм уже занят.');
+          const salt = makeSalt();
+          const hash = await passwordHash(password, salt);
+          const account = { nick, salt, hash, role: 'MEMBER', createdAt: Date.now() };
+          users.push(account); writeAuthUsers(users); activateAccount(account);
+          toast('Аккаунт успешно создан. Добро пожаловать!');
+        } else {
+          const account = isOwnerNick
+            ? { nick: OWNER_NICK, salt: OWNER_SALT, hash: OWNER_HASH, role: 'OWNER' }
+            : users.find(item => item.nick.toLocaleLowerCase('ru') === nick.toLocaleLowerCase('ru'));
+          if (!account) throw new Error('Аккаунт не найден. Сначала зарегистрируйтесь.');
+          const suppliedHash = await passwordHash(password, account.salt);
+          if (suppliedHash !== account.hash) throw new Error('Неверный никнейм или пароль.');
+          activateAccount(account);
+          toast(isOwnerNick ? 'Вход владельца выполнен.' : 'Вы успешно вошли.');
+        }
+      } catch (error) {
+        status.textContent = error.message || 'Не удалось выполнить вход.';
+      } finally {
+        submit.disabled = false;
+      }
+    }
+    function initAuth() {
+      ensureOwnerAccount();
+      const savedNick = storage.getItem(AUTH_SESSION_KEY);
+      if (savedNick === GUEST_SESSION_VALUE) {
+        activateGuest();
+        return;
+      }
+      if (savedNick && savedNick.toLocaleLowerCase('en') !== OWNER_NICK.toLocaleLowerCase('en')) {
+        const account = readAuthUsers().find(item => item.nick.toLocaleLowerCase('ru') === savedNick.toLocaleLowerCase('ru'));
+        if (account) { activateAccount(account); return; }
+      }
+      // Удаляем устаревшую запись владельца из прежних локальных версий.
+      storage.removeItem(AUTH_SESSION_KEY);
+      ownerSession = false;
+      $('#authGate').classList.remove('hidden');
+      setAuthMode('login');
+    }
+    function adminEntry() {
+      if (!canAdmin()) {
+        toast('Доступ закрыт. Войдите как Kryptonka07.', 'error');
+        return;
+      }
+      go('admin');
+      $('#adminGate').classList.add('hidden');
+      $('#adminApp').classList.remove('hidden');
+      refreshAdmin();
+    }
+    function logout() {
+      ownerSession = false;
+      storage.removeItem(AUTH_SESSION_KEY);
+      $('#adminApp').classList.add('hidden');
+      $('#authGate').classList.remove('hidden');
+      $('#authNick').value = '';
+      $('#authPass').value = '';
+      go('home');
+      setAuthMode('login');
+    }
+
+    function requireAdmin() { if (canAdmin()) return true; toast('Требуются права владельца', 'error'); return false; }
+    function adminTab(tab) {
+      if (!requireAdmin()) return;
+      const section = $(`#adm-${tab}`);
+      if (!section) return;
+      $$('.adminsection').forEach(item => item.classList.toggle('active', item === section));
+      $$('.adminnav [data-tab]').forEach(button => button.classList.toggle('active', button.dataset.tab === tab));
+      if (tab === 'posts') renderAdminPosts();
+      if (tab === 'users') renderUsers();
+      if (tab === 'moderation') renderModeration();
+      if (tab === 'rules') renderRuleEditor();
+      if (tab === 'settings') {
+        $('#siteTitle').value = state.settings.title;
+        $('#siteDescription').value = state.settings.description;
+      }
+    }
+    function refreshAdmin() {
+      if (canAdmin()) {
+        $('#adminGate').classList.add('hidden'); $('#adminApp').classList.remove('hidden');
+        $('#adminWelcome').textContent = `Активная роль: ${currentRole()} · ${currentUser()}`;
+        $('#admPostCount').textContent = state.posts.length;
+        $('#admUserCount').textContent = state.users.length;
+        $('#admChatCount').textContent = state.chats.length;
+        $('#admReportCount').textContent = state.reports.filter(report => report.status === 'Новая').length;
+        renderAdminPosts(); renderUsers(); renderModeration();
+      } else {
+        $('#adminGate').classList.remove('hidden'); $('#adminApp').classList.add('hidden');
+      }
+    }
+    function savePost(event) {
+      event.preventDefault();
+      if (!requireAdmin()) return;
+      const id = $('#postId').value;
+      const title = $('#postTitle').value.trim();
+      const body = $('#postBody').value.trim();
+      if (!title || !body) return toast('Заполни заголовок и полный текст', 'error');
+      const data = {
+        id: id || makeId('post'), title: textValue(title, 100), category: textValue($('#postCategory').value, 60),
+        excerpt: textValue($('#postExcerpt').value.trim(), 240), body: textValue(body, 12000),
+        code: textValue($('#postCode').value, 12000), likes: 0, createdAt: Date.now()
+      };
+      if (id) {
+        const index = state.posts.findIndex(post => post.id === id);
+        if (index >= 0) state.posts[index] = { ...state.posts[index], ...data, likes: state.posts[index].likes || 0, createdAt: state.posts[index].createdAt };
+        else state.posts.unshift(data);
+      } else {
+        if (state.posts.length >= MAX_POSTS) return toast('Достигнут лимит публикаций', 'error');
+        state.posts.unshift(data);
+      }
+      if (!save()) return;
+      resetPostForm(); renderPosts(); renderAdminPosts(); refreshAdmin(); toast('Публикация сохранена');
+    }
+    function resetPostForm() { $('#postForm').reset(); $('#postId').value = ''; }
+    function editPost(id) {
+      if (!requireAdmin()) return;
+      const post = state.posts.find(item => item.id === id);
+      if (!post) return;
+      $('#postId').value = post.id; $('#postTitle').value = post.title; $('#postCategory').value = post.category;
+      if (![...$('#postCategory').options].some(option => option.value === post.category)) {
+        const option = document.createElement('option'); option.value = post.category; option.textContent = post.category; $('#postCategory').append(option);
+      }
+      $('#postExcerpt').value = post.excerpt; $('#postBody').value = post.body; $('#postCode').value = post.code || '';
+      $('#postForm').scrollIntoView({ behavior: 'smooth', block: 'start' }); $('#postTitle').focus();
+    }
+    function deletePost(id) {
+      if (!requireAdmin() || !window.confirm('Удалить публикацию?')) return;
+      state.posts = state.posts.filter(post => post.id !== id);
+      save(); renderPosts(); renderAdminPosts(); refreshAdmin(); toast('Публикация удалена');
+    }
+    function renderAdminPosts() {
+      $('#adminPostRows').innerHTML = state.posts.length ? state.posts.map(post => `<tr><td>${escapeHTML(post.title)}</td><td>${escapeHTML(post.category)}</td><td><button class="btn secondary small" type="button" data-action="edit-post" data-id="${escapeHTML(post.id)}">Изменить</button> <button class="btn danger small" type="button" data-action="delete-post" data-id="${escapeHTML(post.id)}">Удалить</button></td></tr>`).join('') : '<tr><td colspan="3">Публикаций пока нет.</td></tr>';
+    }
+    function renderUsers() {
+      $('#userRows').innerHTML = state.users.map((user, index) => {
+        const options = ROLES.filter(role => role !== 'OWNER').map(role => `<option value="${role}"${role === user.role ? ' selected' : ''}>${roleLabel(role)}</option>`).join('');
+        const roleControl = user.role === 'OWNER' ? '<span class="role">Владелец</span>' : `<select class="field" style="width:100%;min-width:145px;padding:7px" data-action="change-role" data-index="${index}" aria-label="Роль пользователя ${escapeHTML(user.name)}">${options}</select>`;
+        const banButton = user.role === 'OWNER' ? '' : `<button class="btn secondary small" type="button" data-action="toggle-ban" data-name="${escapeHTML(user.name)}">${user.banned ? 'Разблок.' : 'Блок.'}</button>`;
+        return `<tr><td>${escapeHTML(user.name)}${user.banned ? ' ⛔' : ''}</td><td>${roleControl}</td><td>${banButton}</td></tr>`;
+      }).join('');
+    }
+    function addUser(event) {
+      event.preventDefault();
+      if (!requireAdmin()) return;
+      const name = $('#newUser').value.trim().slice(0, 28);
+      if (!name) return;
+      if (state.users.some(user => user.name.toLocaleLowerCase('ru') === name.toLocaleLowerCase('ru'))) return toast('Пользователь уже существует', 'error');
+      state.users.push({ name, role: $('#newRole').value, banned: false });
+      save(); $('#newUser').value = ''; renderUsers(); refreshAdmin(); toast('Пользователь добавлен');
+    }
+    function changeRole(index, role) {
+      if (!requireAdmin()) return;
+      const user = state.users[index];
+      if (!user || user.role === 'OWNER' || !ROLES.includes(role) || role === 'OWNER') return toast('Эту роль нельзя назначить', 'error');
+      user.role = role; save(); renderUsers(); renderChat(); toast('Роль обновлена');
+    }
+    function toggleBan(name) {
+      if (!requireAdmin()) return;
+      const user = state.users.find(item => item.name === name);
+      if (!user || user.role === 'OWNER') return;
+      user.banned = !user.banned;
+      state.banned = user.banned ? [...new Set([...state.banned, name])] : state.banned.filter(item => item !== name);
+      save(); renderUsers(); renderModeration(); toast(user.banned ? 'Пользователь заблокирован' : 'Пользователь разблокирован');
+    }
+    function renderModeration() {
+      const reports = state.reports;
+      $('#reportRows').innerHTML = reports.length ? reports.map(report => `<tr><td>${escapeHTML(report.title || report.postId)}</td><td>${escapeHTML(report.author)}</td><td>${escapeHTML(report.reason)}</td><td>${escapeHTML(report.status)}</td><td>${report.status === 'Новая' ? `<button class="btn secondary small" type="button" data-action="resolve-report" data-id="${escapeHTML(report.id)}">Закрыть</button>` : '—'}</td></tr>`).join('') : '<tr><td colspan="5">Жалоб пока нет.</td></tr>';
+      $('#bannedRows').innerHTML = state.banned.length ? state.banned.map(name => `<span class="tag" style="margin:4px">${escapeHTML(name)} <button type="button" data-action="toggle-ban" data-name="${escapeHTML(name)}" aria-label="Разблокировать ${escapeHTML(name)}">×</button></span>`).join('') : '<span class="muted">Нет заблокированных участников.</span>';
+    }
+    function resolveReport(id) {
+      if (!requireAdmin()) return;
+      const report = state.reports.find(item => item.id === id);
+      if (report) { report.status = 'Рассмотрена'; save(); renderModeration(); refreshAdmin(); }
+    }
+    function renderRuleEditor() {
+      $('#ruleEditor').innerHTML = state.rules.map((rule, index) => `<div class="panel" style="padding:12px;margin:10px 0"><label for="ruleTitle${index}">Заголовок</label><input id="ruleTitle${index}" class="field rule-title" maxlength="100" value="${escapeHTML(rule.title)}"><label for="ruleBody${index}" style="margin-top:8px">Описание</label><textarea id="ruleBody${index}" class="field rule-body" rows="2" maxlength="1000">${escapeHTML(rule.body)}</textarea><button class="btn danger small" type="button" data-action="remove-rule" data-index="${index}" style="margin-top:8px">Удалить правило</button></div>`).join('');
+    }
+    function addRule() { if (!requireAdmin()) return; if (state.rules.length >= 100) return toast('Достигнут лимит правил', 'error'); state.rules.push({ title: 'Новое правило', body: 'Описание правила' }); renderRuleEditor(); }
+    function removeRule(index) { if (!requireAdmin()) return; state.rules.splice(index, 1); renderRuleEditor(); }
+    function saveRules() {
+      if (!requireAdmin()) return;
+      const titles = $$('.rule-title'); const bodies = $$('.rule-body');
+      state.rules = titles.map((field, index) => ({ title: field.value.trim().slice(0, 100), body: bodies[index]?.value.trim().slice(0, 1000) || '' })).filter(rule => rule.title && rule.body);
+      save(); renderRules(); renderRuleEditor(); toast('Правила обновлены');
+    }
+    function saveSettings() {
+      if (!requireAdmin()) return;
+      state.settings.title = $('#siteTitle').value.trim().slice(0, 60) || 'RAGNAROKRITH';
+      state.settings.description = $('#siteDescription').value.trim().slice(0, 300);
+      document.title = `RAGNAROKRITH — Каталог Minecraft`;
+      $('meta[name="description"]').content = state.settings.description;
+      save(); toast('Настройки сохранены');
+    }
+    function exportData() {
+      if (!requireAdmin()) return;
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url; link.download = `ragnarok-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.append(link); link.click(); link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 30000);
+      toast('Резервная копия подготовлена');
+    }
+    async function importData(event) {
+      if (!requireAdmin()) return;
+      const file = event.target.files?.[0]; event.target.value = '';
+      if (!file) return;
+      if (file.size > MAX_IMPORT_SIZE) return toast('Файл резервной копии слишком большой (максимум 50 МБ)', 'error');
+      try {
+        const data = JSON.parse(await file.text());
+        if (!data || typeof data !== 'object' || !Array.isArray(data.posts) || !Array.isArray(data.users)) throw new Error('Неверный формат резервной копии');
+        if (!window.confirm('Импорт заменит текущие локальные данные. Продолжить?')) return;
+        state = normalizeState(data);
+        if (!save()) return;
+        ownerSession = false;
+        document.documentElement.dataset.theme = state.theme;
+        $('meta[name="theme-color"]').content = state.theme === 'dark' ? '#201a20' : '#fff8fb';
+        $('#username').textContent = currentUser();
+        document.title = `RAGNAROKRITH — Каталог Minecraft`;
+        renderPosts(); renderRules(); renderChat(); go('home');
+        toast('Данные импортированы. Для панели войдите снова.');
+      } catch (error) { console.error(error); toast('Не удалось импортировать этот файл', 'error'); }
+    }
+    async function resetAll() {
+      if (!requireAdmin() || !window.confirm('Точно удалить все локальные данные RAGNAROKRITH, включая загруженные файлы? Это действие нельзя отменить.')) return;
+      await clearLocalUploads();
+      storage.removeItem(STORAGE_KEY); storage.removeItem(LEGACY_KEY); storage.removeItem(OLDER_LEGACY_KEY);
+      storage.removeItem(AUTH_USERS_KEY); storage.removeItem(AUTH_SESSION_KEY);
+      window.location.reload();
+    }
+
+    const MODRINTH_API = 'https://api.modrinth.com/v2';
+    const modBrowser = { offset: 0, limit: 20, total: 0, loading: false, requestId: 0, query: '', sort: 'downloads', type: 'all', loaders: [], versions: [] };
+    const PROJECT_LABELS = { mod: 'Мод', modpack: 'Модпак', resourcepack: 'Ресурспак', shader: 'Шейдер', plugin: 'Плагин', datapack: 'Датапак' };
+    function safeExternalUrl(value) {
+      try { const parsed = new URL(value); return ['https:', 'http:'].includes(parsed.protocol) ? parsed.href : ''; } catch (_) { return ''; }
+    }
+    function formatBytes(value) {
+      const bytes = Number(value) || 0;
+      if (bytes < 1024) return `${bytes} Б`;
+      if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} КБ`;
+      return `${(bytes / 1048576).toFixed(2)} МБ`;
+    }
+    async function fetchModrinth(path) {
+      const response = await fetch(`${MODRINTH_API}${path}`, { headers: { Accept: 'application/json' } });
+      if (!response.ok) throw new Error(`Modrinth API: ${response.status}`);
+      return response.json();
+    }
+    async function initModrinthTags() {
+      const versionSelect = $('#modVersion');
+      const loaderSelect = $('#modLoader');
+      try {
+        const [versions, loaders] = await Promise.all([
+          fetchModrinth('/tag/game_version'),
+          fetchModrinth('/tag/loader')
+        ]);
+        modBrowser.versions = Array.isArray(versions) ? versions : [];
+        modBrowser.loaders = Array.isArray(loaders) ? loaders : [];
+        const currentVersion = versionSelect.value;
+        const sortedVersions = [...modBrowser.versions].sort((a, b) => {
+          const typeRank = item => ({ release: 0, snapshot: 1, beta: 2, alpha: 3 }[item.version_type] ?? 4);
+          return typeRank(a) - typeRank(b) || String(b.date || '').localeCompare(String(a.date || ''));
+        });
+        versionSelect.innerHTML = '<option value="">Все версии Minecraft</option>' + sortedVersions.map(item => `<option value="${escapeHTML(item.version)}">${escapeHTML(item.version)}${item.version_type === 'release' ? '' : ` · ${escapeHTML(({ snapshot: 'снимок', beta: 'бета', alpha: 'альфа' })[item.version_type] || item.version_type)}`}</option>`).join('');
+        if ([...versionSelect.options].some(option => option.value === currentVersion)) versionSelect.value = currentVersion;
+        const sortedLoaders = [...modBrowser.loaders].sort((a, b) => a.name.localeCompare(b.name));
+        loaderSelect.innerHTML = '<option value="">Все загрузчики</option>' + sortedLoaders.map(item => `<option value="${escapeHTML(item.name)}">${escapeHTML(item.name[0]?.toUpperCase() + item.name.slice(1))}</option>`).join('');
+        $('#modStatus').textContent = `Загружены фильтры: ${sortedVersions.length} версий Minecraft и ${sortedLoaders.length} загрузчиков.`;
+        loadModrinthMods(true);
+      } catch (error) {
+        $('#modStatus').textContent = `Не удалось получить списки версий и загрузчиков: ${error.message}. Попробуй обновить страницу.`;
+        loadModrinthMods(true);
+      }
+    }
+    function setCatalogType(type) {
+      modBrowser.type = type;
+      modBrowser.offset = 0;
+      $$('#catalogTypes [data-type]').forEach(button => {
+        const active = button.dataset.type === type;
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-pressed', String(active));
+      });
+      const loader = $('#modLoader');
+      loader.disabled = ['resourcepack', 'shader'].includes(type);
+      if (loader.disabled) loader.value = '';
+      loadModrinthMods(true);
+    }
+    function buildProjectFacets() {
+      const facets = [];
+      const type = modBrowser.type;
+      if (type === 'all') {
+        facets.push(['all_project_types:mod', 'all_project_types:modpack', 'all_project_types:resourcepack', 'all_project_types:shader', 'all_project_types:plugin', 'all_project_types:datapack']);
+      } else if (type === 'plugin' || type === 'datapack') {
+        facets.push([`all_project_types:${type}`]);
+      } else {
+        facets.push([`project_type:${type}`]);
+      }
+      const version = $('#modVersion').value;
+      const loader = $('#modLoader').value;
+      if (version) facets.push([`versions:${version}`]);
+      if (loader && !['resourcepack', 'shader'].includes(type)) facets.push([`categories:${loader}`]);
+      return facets;
+    }
+    async function loadModrinthMods(reset = false) {
+      if (reset) modBrowser.offset = 0;
+      const requestId = ++modBrowser.requestId;
+      modBrowser.loading = true;
+      const status = $('#modStatus');
+      const grid = $('#modGrid');
+      if (status) status.textContent = 'Загружаем проекты из Modrinth…';
+      if (grid) grid.innerHTML = '<div class="empty">Загрузка каталога…</div>';
+      modBrowser.query = ($('#modSearch').value || '').trim();
+      modBrowser.sort = $('#modSort').value;
+      const params = new URLSearchParams({ facets: JSON.stringify(buildProjectFacets()), limit: String(modBrowser.limit), offset: String(modBrowser.offset), index: modBrowser.sort });
+      if (modBrowser.query) params.set('query', modBrowser.query);
+      try {
+        const data = await fetchModrinth(`/search?${params.toString()}`);
+        if (requestId !== modBrowser.requestId) return;
+        const hits = Array.isArray(data.hits) ? data.hits : [];
+        modBrowser.total = Number(data.total_hits ?? data.total) || hits.length;
+        $('#modResultsCount').textContent = `Найдено: ${modBrowser.total.toLocaleString('ru-RU')}`;
+        $('#modPageLabel').textContent = `Страница ${Math.floor(modBrowser.offset / modBrowser.limit) + 1}`;
+        $('#modPrev').disabled = modBrowser.offset <= 0;
+        $('#modNext').disabled = modBrowser.offset + hits.length >= modBrowser.total || hits.length === 0;
+        const first = modBrowser.total ? modBrowser.offset + 1 : 0;
+        $('#modStatus').textContent = `Показаны проекты ${first}–${modBrowser.offset + hits.length} из ${modBrowser.total.toLocaleString('ru-RU')}. Фильтр: ${PROJECT_LABELS[modBrowser.type] || 'все типы'} · ${$('#modVersion').value || 'все версии'} · ${$('#modLoader').value || 'все загрузчики'}.`;
+        $('#modGrid').innerHTML = hits.length ? hits.map(item => {
+          const icon = safeExternalUrl(item.icon_url);
+          const slug = item.slug || item.project_id;
+          const routeType = PROJECT_LABELS[item.project_type] ? item.project_type : 'project';
+          const projectUrl = `https://modrinth.com/${routeType}/${encodeURIComponent(slug)}`;
+          const label = PROJECT_LABELS[item.project_type] || 'Проект';
+          const selectedVersion = $('#modVersion').value;
+          const versions = Array.isArray(item.versions) ? item.versions : [];
+          const compatible = selectedVersion ? (versions.includes(selectedVersion) ? selectedVersion : 'Совместимость не подтверждена') : versions.slice(0, 5).join(' · ');
+          const loaderNames = (item.categories || []).filter(category => modBrowser.loaders.some(loader => loader.name === category)).slice(0, 5);
+          const categoryNames = (item.display_categories || item.categories || []).filter(category => !modBrowser.loaders.some(loader => loader.name === category)).slice(0, 4);
+          const modified = item.date_modified ? new Date(item.date_modified).toLocaleDateString('ru-RU') : '—';
+          const categoriesHtml = categoryNames.length ? `<div class="project-categories">${categoryNames.map(value => `<span class="tag">${escapeHTML(value.replaceAll('_',' '))}</span>`).join('')}</div>` : '';
+          const loaderText = loaderNames.length ? loaderNames.join(' · ') : 'Зависит от версии проекта';
+          return `<article class="mod-card">
+            <div class="mod-card-head">
+              ${icon ? `<img class="mod-icon" src="${escapeHTML(icon)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : '<span class="mod-icon" aria-hidden="true">✿</span>'}
+              <div style="min-width:0;flex:1">
+                <div class="catalog-card-top"><span class="tag">${escapeHTML(label)}</span><span class="muted catalog-download-count">↓ ${Number(item.downloads || 0).toLocaleString('ru-RU')}</span></div>
+                <h3>${escapeHTML(item.title || 'Без названия')}</h3>
+                <div class="muted" style="font-size:10px">от ${escapeHTML(item.author || 'Автор не указан')}</div>
+              </div>
+            </div>
+            <p>${escapeHTML(item.description || 'Описание отсутствует.')}</p>
+            ${categoriesHtml}
+            <div class="project-stats"><span>★ ${Number(item.follows || 0).toLocaleString('ru-RU')} подписчиков</span><span>Обновлено: ${escapeHTML(modified)}</span><span>Версий: ${versions.length}</span></div>
+            <div class="mod-meta"><span>Minecraft: ${escapeHTML(compatible || 'см. версии')}</span><span>Загрузчики: ${escapeHTML(loaderText)}</span></div>
+            <div class="mod-actions"><button class="btn small" type="button" data-action="get-mod-file" data-project-id="${escapeHTML(item.project_id)}" data-project-title="${escapeHTML(item.title || 'Проект')}" data-project-url="${escapeHTML(projectUrl)}">Версии и скачать</button><a class="btn secondary small" href="${escapeHTML(projectUrl)}" target="_blank" rel="noopener noreferrer">Страница проекта ↗</a></div>
+          </article>`;
+        }).join('') : '<div class="empty">Ничего не найдено. Попробуй изменить тип проекта, версию или загрузчик.</div>';
+      } catch (error) {
+        if (requestId !== modBrowser.requestId) return;
+        $('#modStatus').textContent = `Не удалось загрузить каталог: ${error.message}. Проверь интернет-соединение и попробуй ещё раз.`;
+        $('#modGrid').innerHTML = `<div class="empty">Каталог Modrinth временно недоступен.<br><button class="btn secondary small" type="button" data-action="search-mods" style="margin-top:12px">Повторить загрузку</button></div>`;
+      } finally {
+        if (requestId === modBrowser.requestId) modBrowser.loading = false;
+      }
+    }
+    function renderDownloadFile(file, index) {
+      const url = safeExternalUrl(file.url);
+      if (!url) return '';
+      const filename = textValue(file.filename || `download-${index + 1}`, 180);
+      const version = textValue(file.versionNumber || 'Версия не указана', 60);
+      const fileSize = formatBytes(file.size);
+      const safeFilename = escapeHTML(filename);
+      const safeUrl = escapeHTML(url);
+      return `<div class="version-file-row"><div class="version-file-info"><strong>${safeFilename}${file.primary ? ' · основной файл' : ''}</strong><small>${escapeHTML(version)} · ${fileSize}</small></div><button class="version-download" type="button" data-action="download-mod-file" data-url="${safeUrl}" data-filename="${safeFilename}">↓ Скачать</button></div>`;
+    }
+    function startModrinthDownload(urlValue, filenameValue) {
+      const url = safeExternalUrl(urlValue);
+      if (!url) return toast('Ссылка на файл некорректна.', 'error');
+      const filename = textValue(filenameValue || 'modrinth-file', 180).replace(/[\\/:*?"<>|]/g, '_');
+      // This runs synchronously in the real click handler so mobile popup/download policies can recognize the gesture.
+      let opened = null;
+      try { opened = window.open(url, '_blank'); } catch (error) { console.warn('window.open blocked:', error); }
+      if (opened) {
+        try { opened.opener = null; } catch (_) { /* Cross-origin window proxy may not expose opener. */ }
+        return;
+      }
+      // Fallback for browsers that block the new tab. The download attribute works for same-origin files;
+      // for Modrinth CDN files the server's attachment headers decide whether the browser downloads or opens it.
+      const link = document.createElement('a');
+      link.href = url; link.download = filename; link.target = '_blank'; link.rel = 'noopener noreferrer';
+      link.style.display = 'none'; document.body.append(link); link.click(); link.remove();
+    }
+
+    async function getModrinthFiles(projectId, title, projectUrl = '') {
+      const selectedVersion = $('#modVersion').value;
+      const selectedLoader = $('#modLoader').disabled ? '' : $('#modLoader').value;
+      const params = new URLSearchParams({ include_changelog: 'false' });
+      if (selectedVersion) params.set('game_versions', JSON.stringify([selectedVersion]));
+      if (selectedLoader) params.set('loaders', JSON.stringify([selectedLoader]));
+      try {
+        let rows = await fetchModrinth(`/project/${encodeURIComponent(projectId)}/version?${params.toString()}`);
+        let usedFallback = false;
+        let versions = Array.isArray(rows) ? rows : [];
+        if (!versions.some(version => Array.isArray(version.files) && version.files.some(file => safeExternalUrl(file.url))) && (selectedVersion || selectedLoader)) {
+          usedFallback = true;
+          rows = await fetchModrinth(`/project/${encodeURIComponent(projectId)}/version?include_changelog=false`);
+          versions = Array.isArray(rows) ? rows : [];
+        }
+        versions = versions.filter(version => Array.isArray(version.files) && version.files.some(file => safeExternalUrl(file.url)));
+        if (!versions.length) {
+          const safeProjectUrl = safeExternalUrl(projectUrl) || `https://modrinth.com/project/${encodeURIComponent(projectId)}`;
+          return openModal('Файлы не найдены', `<p>Для проекта «${escapeHTML(title)}» в Modrinth пока нет доступных файлов.</p><p>Открой страницу проекта и проверь раздел версий автора.</p><p><a class="btn secondary small" href="${escapeHTML(safeProjectUrl)}" target="_blank" rel="noopener noreferrer">Открыть проект на Modrinth ↗</a></p>`);
+        }
+        versions.sort((a,b) => String(b.date_published || '').localeCompare(String(a.date_published || '')));
+        const displayVersions = versions.slice(0, 60);
+        const fallbackNote = usedFallback ? '<div class="notice" style="margin-bottom:12px">Выбранные фильтры не нашли совместимые файлы. Ниже показаны все доступные версии проекта.</div>' : '';
+        const groups = displayVersions.map((version, versionIndex) => {
+          const releaseLabel = ({ release:'Релиз', beta:'Бета', alpha:'Альфа', snapshot:'Снимок' })[version.version_type] || version.version_type || 'Релиз';
+          const published = version.date_published ? new Date(version.date_published).toLocaleDateString('ru-RU') : 'Дата не указана';
+          const gameVersions = (version.game_versions || []).slice(0, 12);
+          const loaders = (version.loaders || []).slice(0, 8);
+          const meta = [...gameVersions.map(value => `MC ${value}`), ...loaders.map(value => value[0]?.toUpperCase()+value.slice(1))];
+          const files = (version.files || []).filter(file => safeExternalUrl(file.url)).sort((a,b) => Number(Boolean(b.primary))-Number(Boolean(a.primary)));
+          return `<section class="version-group"><div class="version-group-head"><div><strong>${escapeHTML(version.name || version.version_number || `Версия ${versionIndex+1}`)}</strong><div><small>${escapeHTML(version.version_number || '')} · ${escapeHTML(releaseLabel)} · ${escapeHTML(published)}</small></div></div><span class="tag">${files.length} файл(ов)</span></div><div class="version-group-meta">${meta.map(value => `<span class="tag">${escapeHTML(value)}</span>`).join('') || '<span class="muted" style="font-size:10px">Совместимость указана в файле</span>'}</div>${files.map((file,fileIndex) => renderDownloadFile({ ...file, versionNumber: version.version_number },fileIndex)).join('')}</section>`;
+        }).join('');
+        const safeProjectUrl = safeExternalUrl(projectUrl) || `https://modrinth.com/project/${encodeURIComponent(projectId)}`;
+        openModal('Версии и загрузка', `${fallbackNote}<div class="modrinth-source-note"><p>Проект: <strong>${escapeHTML(title)}</strong></p><a href="${escapeHTML(safeProjectUrl)}" target="_blank" rel="noopener noreferrer">Страница на Modrinth ↗</a></div>${groups}${versions.length > displayVersions.length ? `<p class="muted" style="font-size:10px">Показаны последние ${displayVersions.length} из ${versions.length} версий. Полный список доступен на Modrinth.</p>` : ''}`);
+      } catch (error) {
+        toast(`Не удалось получить файлы: ${error.message}. Проверь соединение и попробуй ещё раз.`, 'error');
+      }
+    }
+
+    // Browser-local uploads: IndexedDB is preferred; small files get a localStorage fallback.
+    const LOCAL_UPLOAD_DB = 'ragnarokrith_local_uploads';
+    const LOCAL_UPLOAD_STORE = 'files';
+    const LOCAL_UPLOAD_FALLBACK_KEY = 'ragnarokrith_upload_files_v1';
+    const MAX_LOCAL_UPLOAD_BYTES = 250 * 1024 * 1024;
+    const MAX_FALLBACK_UPLOAD_BYTES = 1500 * 1024;
+    const ALLOWED_UPLOAD_EXTENSIONS = new Set(['jar','zip','mrpack','mcpack','mcaddon','mcworld','mcmeta','json']);
+    const localUploadMemory = new Map();
+    let uploadDbUnavailable = false;
+    function openUploadDB() {
+      if (!('indexedDB' in window)) return Promise.reject(new Error('IndexedDB поддерживается не всеми браузерами.'));
+      if (dbPromise) return dbPromise;
+      dbPromise = new Promise((resolve, reject) => {
+        let request;
+        try { request = indexedDB.open(LOCAL_UPLOAD_DB, 1); }
+        catch (error) { reject(error); return; }
+        request.onupgradeneeded = () => {
+          const db = request.result;
+          if (!db.objectStoreNames.contains(LOCAL_UPLOAD_STORE)) {
+            const store = db.createObjectStore(LOCAL_UPLOAD_STORE, { keyPath: 'id' });
+            store.createIndex('createdAt', 'createdAt', { unique: false });
+          }
+        };
+        request.onsuccess = () => {
+          uploadDbUnavailable = false;
+          const db = request.result;
+          db.onversionchange = () => { db.close(); dbPromise = null; };
+          resolve(db);
+        };
+        request.onerror = () => reject(request.error || new Error('IndexedDB не удалось открыть.'));
+        request.onblocked = () => reject(new Error('Хранилище занято другой вкладкой. Закройте дубликаты сайта и обновите страницу.'));
+      }).catch(error => { dbPromise = null; uploadDbUnavailable = true; throw error; });
+      return dbPromise;
+    }
+    function readFallbackUploads() {
+      try {
+        const data = JSON.parse(storage.getItem(LOCAL_UPLOAD_FALLBACK_KEY) || '[]');
+        return Array.isArray(data) ? data : [];
+      } catch (_) { return []; }
+    }
+    function writeFallbackUploads(items) {
+      return storage.setItem(LOCAL_UPLOAD_FALLBACK_KEY, JSON.stringify(items));
+    }
+    function blobToDataURL(blob) {
+      return new Promise((resolve,reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ''));
+        reader.onerror = () => reject(reader.error || new Error('Не удалось прочитать файл.'));
+        reader.readAsDataURL(blob);
+      });
+    }
+    function dataURLToBlob(dataURL, mimeType) {
+      const comma = String(dataURL).indexOf(',');
+      if (comma < 0) throw new Error('Повреждённая резервная копия файла.');
+      const binary = atob(String(dataURL).slice(comma + 1));
+      const bytes = new Uint8Array(binary.length);
+      for (let i=0;i<binary.length;i++) bytes[i] = binary.charCodeAt(i);
+      return new Blob([bytes], { type: mimeType || 'application/octet-stream' });
+    }
+    async function uploadDBRequest(mode, action, value) {
+      try {
+        const db = await openUploadDB();
+        return await new Promise((resolve, reject) => {
+          let transaction;
+          try { transaction = db.transaction(LOCAL_UPLOAD_STORE, mode); }
+          catch (error) { reject(error); return; }
+          const store = transaction.objectStore(LOCAL_UPLOAD_STORE);
+          let request;
+          try { request = action === 'put' ? store.put(value) : action === 'delete' ? store.delete(value) : action === 'clear' ? store.clear() : action === 'get' ? store.get(value) : store.getAll(); }
+          catch (error) { reject(error); return; }
+          let result;
+          request.onsuccess = () => { result = request.result; };
+          request.onerror = () => reject(request.error || new Error('Файловое хранилище не выполнило запрос.'));
+          transaction.oncomplete = () => resolve(result);
+          transaction.onerror = () => reject(transaction.error || new Error('Ошибка транзакции файлового хранилища.'));
+          transaction.onabort = () => reject(transaction.error || new Error('Операция с файлом отменена.'));
+        });
+      } catch (error) {
+        uploadDbUnavailable = true;
+        // For local-file/locked-down browsers, small uploads can still survive refresh via localStorage.
+        if (action === 'put' && value && value.size <= MAX_FALLBACK_UPLOAD_BYTES && storagePersistent) {
+          try {
+            const dataURL = await blobToDataURL(value.blob);
+            const rows = readFallbackUploads().filter(item => item.id !== value.id);
+            const { blob, ...metadata } = value;
+            rows.unshift({ ...metadata, dataURL });
+            if (writeFallbackUploads(rows)) return true;
+          } catch (fallbackError) { console.warn('Small-file fallback failed:', fallbackError); }
+        }
+        if (action === 'put') { localUploadMemory.set(value.id, value); return true; }
+        if (action === 'get') {
+          if (localUploadMemory.has(value)) return localUploadMemory.get(value);
+          const item = readFallbackUploads().find(record => record.id === value);
+          return item ? { ...item, blob: dataURLToBlob(item.dataURL,item.mimeType) } : null;
+        }
+        if (action === 'all') {
+          const fallback = readFallbackUploads().map(item => ({ ...item, blob: dataURLToBlob(item.dataURL,item.mimeType) }));
+          const memory = [...localUploadMemory.values()];
+          return [...memory, ...fallback];
+        }
+        if (action === 'delete') {
+          localUploadMemory.delete(value);
+          writeFallbackUploads(readFallbackUploads().filter(item => item.id !== value));
+          return true;
+        }
+        if (action === 'clear') {
+          localUploadMemory.clear();
+          writeFallbackUploads([]);
+          return true;
+        }
+        throw error;
+      }
+    }
+    async function renderLocalUploads() {
+      const host = $('#localUploads');
+      if (!host) return;
+      try {
+        const records = await uploadDBRequest('readonly','all');
+        records.sort((a,b) => Number(b.createdAt || 0)-Number(a.createdAt || 0));
+        $('#localUploadCount').textContent = `${records.length} файл(ов)`;
+        if (uploadDbUnavailable && records.length) statusUploadFallbackHint();
+        if (!records.length) { host.innerHTML = '<div class="empty">Пока нет загруженных файлов. Добавь первый файл через форму выше.</div>'; return; }
+        host.innerHTML = records.map(record => {
+          const canDelete = record.uploader === currentUser() || canAdmin();
+          const label = PROJECT_LABELS[record.type] || 'Файл';
+          const meta = [record.version ? `Minecraft ${record.version}` : '',record.loader || '',record.release ? `Версия ${record.release}` : '',formatBytes(record.size),new Date(record.createdAt).toLocaleDateString('ru-RU')].filter(Boolean).join(' · ');
+          return `<article class="local-upload-card"><div class="catalog-card-top"><span class="tag">${escapeHTML(label)}</span><span class="muted" style="font-size:10px">${escapeHTML(record.uploader || 'Гость')}</span></div><h4>${escapeHTML(record.title)}</h4><p>${escapeHTML(record.description || record.filename)}</p><div class="local-upload-meta"><span class="file-name">${escapeHTML(record.filename)}</span><span>${escapeHTML(meta)}</span></div><div class="local-upload-card-actions"><button class="btn small" type="button" data-action="download-local-upload" data-id="${escapeHTML(record.id)}">↓ Скачать</button>${canDelete ? `<button class="btn secondary small" type="button" data-action="delete-local-upload" data-id="${escapeHTML(record.id)}">Удалить</button>` : ''}</div></article>`;
+        }).join('');
+      } catch (error) {
+        $('#localUploadCount').textContent = 'Омбор недоступен';
+        host.innerHTML = `<div class="empty">Не удалось открыть локальное файловое хранилище: ${escapeHTML(error.message)}<br>Открой страницу в актуальном Chrome/Firefox и разреши хранение данных сайта.</div>`;
+      }
+    }
+    function statusUploadFallbackHint() {
+      const note = $('#localUploadStatus');
+      if (note && !note.textContent) note.textContent = storagePersistent ? 'IndexedDB ishlamayapti: kichik fayllar brauzer xotirasida saqlanadi, katta fayllar faqat joriy sessiyada.' : 'Doimiy saqlash brauzer tomonidan bloklangan; fayllar faqat shu sahifa ochiq turganda turadi.';
+    }
+    async function saveLocalUpload(event) {
+      event.preventDefault();
+      const form = $('#localUploadForm');
+      const submit = $('#localUploadSubmit');
+      const file = $('#localUploadFile').files?.[0];
+      const title = $('#localUploadTitle').value.trim();
+      const status = $('#localUploadStatus');
+      status.textContent = '';
+      if (!file) { status.textContent = 'Avval fayl tanlang.'; return; }
+      if (!title) { status.textContent = 'Loyiha nomini kiriting.'; return; }
+      const extension = file.name.includes('.') ? file.name.split('.').pop().toLowerCase() : '';
+      if (!ALLOWED_UPLOAD_EXTENSIONS.has(extension)) { status.textContent = 'Bu fayl formati qo‘llab-quvvatlanmaydi.'; return; }
+      if (!file.size || file.size > MAX_LOCAL_UPLOAD_BYTES) { status.textContent = 'Fayl bo‘sh yoki 250 MB limitdan katta.'; return; }
+      submit.disabled = true;
+      status.textContent = 'Fayl saqlanmoqda…';
+      try {
+        if (navigator.storage?.estimate) {
+          const estimate = await navigator.storage.estimate().catch(() => null);
+          if (estimate?.quota && Number(estimate.usage || 0) + file.size > estimate.quota * 0.95) throw new Error('Brauzer xotirasida joy yetarli emas. Keraksiz fayllarni o‘chiring.');
+        }
+        const record = {
+          id: makeId('localfile'), title: textValue(title,100), type: $('#localUploadType').value,
+          version: textValue($('#localUploadVersion').value.trim(),40), loader: textValue($('#localUploadLoader').value.trim(),60),
+          release: textValue($('#localUploadRelease').value.trim(),40), description: textValue($('#localUploadDescription').value.trim(),500),
+          filename: textValue(file.name,180), mimeType: textValue(file.type || 'application/octet-stream',120),
+          size: file.size, uploader: textValue(currentUser(),28), createdAt: Date.now(), blob: file.slice(0,file.size,file.type || 'application/octet-stream')
+        };
+        await uploadDBRequest('readwrite','put',record);
+        form.reset();
+        $('#localUploadFileInfo').textContent = 'Форматы: JAR, ZIP, MRPACK, MCPACK, MCADDON, MCWORLD, JSON. Максимум 250 МБ.';
+        status.textContent = uploadDbUnavailable ? (storagePersistent && file.size <= MAX_FALLBACK_UPLOAD_BYTES ? 'Fayl brauzer xotirasiga saqlandi (kichik fayllar uchun zaxira usul).' : 'Fayl yuklandi, lekin faqat joriy sessiya davomida saqlanadi; doimiy saqlash uchun HTTPS hostingdan foydalaning.') : 'Fayl muvaffaqiyatli saqlandi.';
+        toast('Fayl lokal kutubxonaga yuklandi.');
+        await renderLocalUploads();
+      } catch (error) {
+        console.error('Local upload error:', error);
+        status.textContent = error.message || 'Faylni saqlab bo‘lmadi.';
+        toast(error.message || 'Faylni saqlab bo‘lmadi.', 'error');
+      } finally { submit.disabled = false; }
+    }
+    async function downloadLocalUpload(id) {
+      try {
+        const record = await uploadDBRequest('readonly','get',id);
+        if (!record?.blob) throw new Error('Fayl topilmadi.');
+        const url = URL.createObjectURL(record.blob);
+        const link = document.createElement('a');
+        link.href = url; link.download = record.filename || 'ragnarokrith-file';
+        link.style.display = 'none'; document.body.append(link); link.click(); link.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 60000);
+        toast('Fayl yuklab olishga tayyor.');
+      } catch (error) { toast(error.message || 'Yuklab olish amalga oshmadi.', 'error'); }
+    }
+    async function deleteLocalUpload(id) {
+      try {
+        const record = await uploadDBRequest('readonly','get',id);
+        if (!record) return toast('Fayl topilmadi.', 'error');
+        if (record.uploader !== currentUser() && !canAdmin()) return toast('Bu faylni o‘chirishga ruxsat yo‘q.', 'error');
+        if (!window.confirm(`«${record.title}» faylini lokal kutubxonadan o‘chirasizmi?`)) return;
+        await uploadDBRequest('readwrite','delete',id);
+        await renderLocalUploads(); toast('Fayl o‘chirildi.');
+      } catch (error) { toast(error.message || 'Faylni o‘chirib bo‘lmadi.', 'error'); }
+    }
+    async function clearLocalUploads() {
+      localUploadMemory.clear();
+      storage.removeItem(LOCAL_UPLOAD_FALLBACK_KEY);
+      try { await uploadDBRequest('readwrite','clear'); } catch (error) { console.warn('Local upload store could not be cleared:', error); }
+    }
+
+    function toggleAI(force) {
+      const panel = $('#aiPanel');
+      const open = typeof force === 'boolean' ? force : !panel.classList.contains('open');
+      panel.classList.toggle('open', open);
+      panel.setAttribute('aria-hidden', String(!open));
+      $('#aiFab').setAttribute('aria-expanded', String(open));
+      if (open) $('#aiInput').focus();
+    }
+    function appendAIMessage(content, role = 'assistant') {
+      const item = document.createElement('div');
+      item.className = `ai-msg${role === 'user' ? ' user' : ''}`;
+      item.textContent = content;
+      $('#aiFeed').append(item);
+      $('#aiFeed').scrollTop = $('#aiFeed').scrollHeight;
+    }
+    function localAIAnswer(question) {
+      const q = question.toLocaleLowerCase('ru');
+      if (/\b(привет|здравствуй|здравствуйте|добрый день|hello)\b/.test(q)) return 'Привет! Я локальный помощник RAGNAROKRITH. Помогу с выбором типа проекта, версий Minecraft, загрузчиков и установкой скачанных файлов.';
+      if (/загрузчик|loader|fabric|forge|neoforge|quilt|paper|spigot|bukkit|velocity|purpur/.test(q)) return 'Загрузчик должен совпадать с тем, для чего собран файл. Для клиентских модов обычно используют Fabric, Forge, NeoForge или Quilt. Для серверных плагинов — Paper, Spigot, Bukkit, Purpur, Folia или Velocity. Проверь вкладку «Версии и скачать»: там указаны загрузчики именно выбранной сборки.';
+      if (/ресурспак|текстур|resource.?pack/.test(q)) return 'Ресурспак меняет текстуры, звуки и визуальные элементы. Скачай файл с подходящей версией игры, открой Minecraft → Настройки → Наборы ресурсов и активируй его. Не распаковывай архив, если автор прямо не просит этого.';
+      if (/шейдер|shader/.test(q)) return 'Шейдеры меняют освещение, воду, тени и атмосферу. Сначала проверь, какой шейдерный загрузчик и версия игры указаны автором. Не каждый шейдер работает с каждым модом рендеринга.';
+      if (/модпак|modpack|mrpack/.test(q)) return 'Модпак — набор модов и настроек. Для файла .mrpack используй совместимый лаунчер с импортом Modrinth-паков. До запуска проверь версию Minecraft, загрузчик, память и список зависимостей.';
+      if (/плагин|plugin|paper|spigot|bukkit/.test(q)) return 'Плагины обычно устанавливаются на серверные платформы. Сверь поддержку Paper, Spigot, Bukkit, Purpur или другого загрузчика в карточке версии. Не помещай серверный плагин в папку клиентских модов.';
+      if (/скач|установ|install|как поставить/.test(q)) return 'Открой RAGNAROKRITH → выбери категорию → укажи версию Minecraft и загрузчик → нажми «Версии и скачать». Выбери основной файл. После скачивания следуй инструкции автора и сделай резервную копию мира перед установкой модификаций.';
+      if (/верси|совместим|1\./.test(q)) return 'В каталоге фильтр версии получает список версий непосредственно из Modrinth. Выбери точную версию игры. Если результатов нет, попробуй «Все версии» — у некоторых проектов поддержка отличается между отдельными версиями.';
+      if (/безопас|вирус|провер/.test(q)) return 'Скачивай файлы только со страницы автора или официального каталога. Проверяй имя автора, описание, дату обновления, отзывы и совместимость. Не запускай неизвестные .exe или .apk ради модов. Сохраняй копию мира перед установкой.';
+      if (/каталог|поиск|фильтр|ragnarokrith/.test(q)) return 'Вверху каталога выбери тип: «Всё», «Моды», «Модпаки», «Ресурспаки», «Шейдеры», «Плагины» или «Датапаки». Ниже доступны версия Minecraft, загрузчик и сортировка. Каталог листается кнопками «Назад» и «Далее».';
+      return 'Я работаю как встроенный справочник без подключения к облачной языковой модели. Лучше всего отвечаю на вопросы об установке Minecraft-модов, Fabric/Forge/NeoForge/Quilt, плагинах, модпаках, ресурспаках, шейдерах и фильтрах RAGNAROKRITH. Сформулируй вопрос подробнее — подскажу по этим темам.';
+    }
+    function sendAI(event) {
+      event.preventDefault();
+      const input = $('#aiInput');
+      const content = input.value.trim();
+      if (!content) return;
+      appendAIMessage(content, 'user');
+      input.value = '';
+      const answer = localAIAnswer(content);
+      window.setTimeout(() => appendAIMessage(answer), 120);
+    }
+
+    document.addEventListener('click', event => {
+      const button = event.target.closest('[data-action]');
+      if (!button) return;
+      const { action, page, id, tab, category, index, name } = button.dataset;
+      switch (action) {
+        case 'go': event.preventDefault(); currentCategory = 'Все'; go(page); if (page === 'home') renderPosts(); break;
+        case 'go-category': goCategory(category); break;
+        case 'toggle-menu': {
+          const open = $('#nav').classList.toggle('open'); button.setAttribute('aria-expanded', String(open)); break;
+        }
+        case 'toggle-theme': toggleTheme(); break;
+        case 'profile': openProfile(); break;
+        case 'logout-user': logout(); break;
+        case 'admin-entry': adminEntry(); break;
+        case 'scroll-feed': $('#feed').scrollIntoView({ behavior: 'smooth', block: 'start' }); break;
+        case 'new-post': adminEntry(); if (canAdmin()) adminTab('posts'); break;
+        case 'set-category': setCategory(category); break;
+        case 'like-post': likePost(id); break;
+        case 'report-post': reportPost(id); break;
+        case 'read-post': readPost(id); break;
+        case 'close-modal': closeModal(); break;
+        case 'copy-code': copyText($('#postCodeBlock')?.textContent || ''); break;
+        case 'admin-tab': adminTab(tab); break;
+        case 'logout': logout(); break;
+        case 'reset-post-form': resetPostForm(); break;
+        case 'edit-post': editPost(id); break;
+        case 'delete-post': deletePost(id); break;
+        case 'toggle-ban': toggleBan(name); break;
+        case 'resolve-report': resolveReport(id); break;
+        case 'add-rule': addRule(); break;
+        case 'remove-rule': removeRule(Number(index)); break;
+        case 'save-rules': saveRules(); break;
+        case 'save-settings': saveSettings(); break;
+        case 'export-data': exportData(); break;
+        case 'choose-import': if (requireAdmin()) $('#importFile').click(); break;
+        case 'reset-all': resetAll(); break;
+        case 'search-mods': loadModrinthMods(true); break;
+        case 'catalog-type': setCatalogType(button.dataset.type || 'all'); break;
+        case 'mods-prev': modBrowser.offset = Math.max(0, modBrowser.offset - modBrowser.limit); loadModrinthMods(false); break;
+        case 'mods-next': modBrowser.offset += modBrowser.limit; loadModrinthMods(false); break;
+        case 'get-mod-file': getModrinthFiles(button.dataset.projectId, button.dataset.projectTitle, button.dataset.projectUrl); break;
+        case 'download-mod-file': event.preventDefault(); startModrinthDownload(button.dataset.url, button.dataset.filename); break;
+        case 'delete-chat-message': deleteChatMessage(id); break;
+        case 'download-local-upload': downloadLocalUpload(id); break;
+        case 'delete-local-upload': deleteLocalUpload(id); break;
+      }
+    });
+    document.addEventListener('change', event => {
+      const target = event.target;
+      if (target.matches('[data-action="change-role"]')) changeRole(Number(target.dataset.index), target.value);
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        closeModal();
+        if ($('#aiPanel').classList.contains('open')) toggleAI(false);
+      }
+      if (event.key === 'Tab' && $('#modal').classList.contains('show')) {
+        const focusable = $$('button, input, textarea, select, a[href]', $('#modal')).filter(element => !element.disabled && element.offsetParent !== null);
+        if (!focusable.length) return;
+        const first = focusable[0]; const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+      }
+    });
+    $('#modal').addEventListener('click', event => { if (event.target === $('#modal')) closeModal(); });
+    $('#search').addEventListener('input', renderPosts);
+    $('#chatForm').addEventListener('submit', sendChat);
+    $('#authForm').addEventListener('submit', submitAuth);
+    $('#authLoginTab').addEventListener('click', () => setAuthMode('login'));
+    $('#authRegisterTab').addEventListener('click', () => setAuthMode('register'));
+    $('#guestContinue').addEventListener('click', activateGuest);
+    $('#postForm').addEventListener('submit', savePost);
+    $('#userForm').addEventListener('submit', addUser);
+    $('#importFile').addEventListener('change', importData);
+    $('#localUploadForm').addEventListener('submit', saveLocalUpload);
+    $('#localUploadFile').addEventListener('change', () => {
+      const file = $('#localUploadFile').files?.[0];
+      $('#localUploadFileInfo').textContent = file ? `${file.name} · ${formatBytes(file.size)}` : 'Formati: JAR, ZIP, MRPACK, MCPACK, MCADDON, MCWORLD, JSON. Maksimum 250 MB.';
+    });
+    $('#modSearch').addEventListener('keydown', event => { if (event.key === 'Enter') loadModrinthMods(true); });
+    $('#modVersion').addEventListener('change', () => loadModrinthMods(true));
+    $('#modLoader').addEventListener('change', () => loadModrinthMods(true));
+    $('#modSort').addEventListener('change', () => loadModrinthMods(true));
+    $('#aiFab').addEventListener('click', () => toggleAI());
+    $('#aiClose').addEventListener('click', () => toggleAI(false));
+    $('#aiForm').addEventListener('submit', sendAI);
+
+    // Initialize page data and session. A guest session also survives a normal refresh.
+    document.documentElement.dataset.theme = state.theme;
+    $('meta[name="theme-color"]').content = state.theme === 'dark' ? '#201a20' : '#fff8fb';
+    $('#username').textContent = currentUser();
+    $('#year').textContent = new Date().getFullYear();
+    document.title = `RAGNAROKRITH — Каталог Minecraft`;
+    $('meta[name="description"]').content = state.settings.description || initialState.settings.description;
+    renderPosts(); renderRules(); renderChat();
+    initAuth();
+    initModrinthTags();
+    renderLocalUploads();
+    if (!storagePersistent) {
+      toast('Bu brauzer localStorage ni blokladi. Ma’lumotlar faqat shu sahifa ochiq turgan paytda saqlanadi; doimiy saqlash uchun brauzer sayt ma’lumotlariga ruxsat bering.', 'error');
+    }
+
+    // Keep already-open tabs in sync when the same browser updates local data.
+    window.addEventListener('storage', event => {
+      if (event.key !== STORAGE_KEY || !event.newValue) return;
+      try {
+        state = normalizeState(JSON.parse(event.newValue));
+        document.documentElement.dataset.theme = state.theme;
+        renderPosts(); renderRules(); renderChat(); refreshAdmin();
+      } catch (error) { console.warn('Не удалось синхронизировать изменения из другой вкладки.', error); }
+    });
+  </script>
+</body>
+</html>
